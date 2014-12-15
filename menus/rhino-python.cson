@@ -1,0 +1,21 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'RhinoPython'
+      'submenu': [
+        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'}
+      ]
+    }
+  ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'RhinoPython'
+      'submenu': [
+        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'}
+      ]
+    ]
+  }
+]
