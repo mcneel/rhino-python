@@ -1,6 +1,8 @@
 # rhino-python package
 
-Rhino Python provides editor support for writing Python scripts that are to be executed inside Rhinoceros (www.rhino3d.com).
+Rhino Python provides editor support for writing Python scripts that are executed by Rhinoceros (www.rhino3d.com).
+
+IMPORTANT: install the 'autocomplete-plus' package before installing 'rhino-python'.
 
 Code completion services and asking Rhino to run the script are currently supported.  You first have to tell Rhino to listen for Atom requests by first running the StartRhinoListener command at the Rhino command prompt."
 

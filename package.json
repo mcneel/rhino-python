@@ -2,7 +2,7 @@
   "name": "rhino-python",
   "main": "./lib/rhino-python",
   "version": "0.1.0",
-  "description": "Rhino Python provides editor support for writing Python scripts that are to be executed inside Rhinoceros (www.rhino3d.com).  Code completion services and asking Rhino to run the script are currently supported.  You first have to tell Rhino to listen for Atom requests by first running the StartRhinoListener command at the Rhino command prompt.",
+  "description": "Editor support for writting python scripts that are executed by Rhinoceros (http://www.rhino3d.com).",
   "repository": "https://github.com/mcneel/rhino-python",
   "license": "MIT",
   "engines": {
