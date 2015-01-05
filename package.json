@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "fuzzaldrin": "*",
-    "jquery": "*",
-    "autocomplete-plus": "0.22.13"
+    "jquery": "*"
   }
 }

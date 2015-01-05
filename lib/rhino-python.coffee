@@ -1,8 +1,8 @@
 #RhinoPythonView = require './rhino-python-view'
-RhinoAutocompletePlusPythonProvider = require './rhino-autocomplete-plus-python-provider'
+#RhinoAutocompletePlusPythonProvider = require './rhino-autocomplete-plus-python-provider'
 jQuery = require "jquery"
 
-module.exports =
+module.exports = RhinoPython =
   #rhinoPythonView: null
   editorSubscription: null
   autocomplete: null
@@ -18,7 +18,20 @@ module.exports =
     atom.packages.activatePackage("autocomplete-plus")
       .then (pkg) =>
         @autocomplete = pkg.mainModule
-        @registerProviders()
+        return unless @autocomplete?
+        Provider = (require './rhino-autocomplete-plus-python-provider').ProviderClass(@autocomplete.Provider, @autocomplete.Suggestion)
+        return unless Provider?
+        @editorSubscription = atom.workspace.observeTextEditors((editor) => @registerProvider(Provider, editor))
+
+  registerProvider: (Provider, editor) ->
+    return unless Provider?
+    return unless editor?
+    editorView = atom.views.getView(editor)
+    return unless editorView?
+    if not editorView.mini
+      provider = new Provider(editor)
+      @autocomplete.registerProviderForEditor(provider, editor)
+      @providers.push(provider)
 
   deactivate: ->
     #@rhinoPythonView.destroy()
@@ -27,13 +40,6 @@ module.exports =
     @providers.forEach (provider) =>
       @autocomplete.unregisterProvider provider
     @providers = []
-
-  registerProviders: ->
-    @editorSubscription = atom.workspaceView.eachEditorView (editorView) =>
-      if editorView.attached and not editorView.mini
-        provider = new RhinoAutocompletePlusPythonProvider editorView
-        @autocomplete.registerProviderForEditorView provider, editorView
-        @providers.push provider
 
   #serialize: ->
   #  rhinoPythonViewState: @rhinoPythonView.serialize()
