@@ -91,7 +91,7 @@ module.exports = RhinoPython =
     #rhino = shelljs.exec("open /Users/acormier/Library/Developer/Xcode/DerivedData/MacRhino-eyizkxchsvxtptaqlkvbexthtwuy/Build/Products/Debug/Rhinoceros.app", async: true)
     rhinoPath = "open #{ atom.config.get 'rhino-python.rhinoPath'}"
     console.log "bringRhinoToFront: #{rhinoPath}"
-    rhino = shelljs.exec(rhinoPath, async: true)
-    rhino.stdout.on "data", (data) ->
-      console.log data
-      return
+    rhino = shelljs.exec(rhinoPath, async: true, (code, output) ->
+      console.log "bringRhinoToFront: exit code: #{code}"
+      console.log "bringRhinoToFront: output: #{output}" unless not output
+    )
