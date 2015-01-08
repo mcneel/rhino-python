@@ -54,7 +54,7 @@ ProviderClass: (Provider, Suggestion) ->
 
       jQuery.ajax
         type: "POST"
-        url: "http://localhost:8080/getcompletiondata"
+        url: "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getcompletiondata"
         data: ccreq
         retryLimit: 0
         success: (data) ->

@@ -1,8 +1,21 @@
 #RhinoPythonView = require './rhino-python-view'
 #RhinoAutocompletePlusPythonProvider = require './rhino-autocomplete-plus-python-provider'
 jQuery = require "jquery"
+shelljs = require "shelljs"
 
 module.exports = RhinoPython =
+  config:
+    httpPort:
+      title: 'Port Number'
+      description: 'Port number that Rhino listens on for http requests.  NOTE: has to match the port number configured in Rhinoceros.'
+      type: 'integer'
+      default: 8080
+    rhinoPath:
+      title: 'Rhinoceros Path'
+      description: 'Rhinoceros application path.  ex: /Applications/Rhinoceros.app'
+      type: 'string'
+      default: '/Applications/Rhinoceros.app'
+
   #rhinoPythonView: null
   editorSubscription: null
   autocomplete: null
@@ -15,6 +28,7 @@ module.exports = RhinoPython =
   activate: (state) ->
     #@rhinoPythonView = new RhinoPythonView(state.rhinoPythonViewState)
     atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
+
     atom.packages.activatePackage("autocomplete-plus")
       .then (pkg) =>
         @autocomplete = pkg.mainModule
@@ -50,14 +64,18 @@ module.exports = RhinoPython =
       alert("Can't save and run.  Not a python file.")
       return
     editor.save()
+
+    @bringRhinoToFront()
+
     rpfreq = JSON.stringify {FileName: editor.getPath()}
+    rhinoUrl = "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/runpythonscriptfile"
     jQuery.ajax
       type: "POST"
-      url: "http://localhost:8080/runpythonscriptfile"
+      url: rhinoUrl
       data: rpfreq
       retryLimit: 0
       success: (response) ->
-        console.log "success:", response
+        console.log "success:", response.msg
       error: (response, status, error) ->
         if /^NetworkError/.test response.statusText
           alert("Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino.")
@@ -68,3 +86,12 @@ module.exports = RhinoPython =
       dataType: "json"
       async: false
       #timeout: 3000  # timeout doesn't work when async is false
+
+  bringRhinoToFront: =>
+    #rhino = shelljs.exec("open /Users/acormier/Library/Developer/Xcode/DerivedData/MacRhino-eyizkxchsvxtptaqlkvbexthtwuy/Build/Products/Debug/Rhinoceros.app", async: true)
+    rhinoPath = "open #{ atom.config.get 'rhino-python.rhinoPath'}"
+    console.log "bringRhinoToFront: #{rhinoPath}"
+    rhino = shelljs.exec(rhinoPath, async: true)
+    rhino.stdout.on "data", (data) ->
+      console.log data
+      return
