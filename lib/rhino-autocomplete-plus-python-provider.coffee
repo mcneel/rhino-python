@@ -1,6 +1,5 @@
-{BufferedProcess}  = require "atom"
+{BufferedProcess, $}  = require "atom"
 fuzz = require "fuzzaldrin"
-jQuery = require "jquery"
 
 exports.fetchedCompletionData = []
 
@@ -52,7 +51,7 @@ ProviderClass: (Provider, Suggestion) ->
       last_dot_or_space_column = bp.column - prefix.length
       ccreq = JSON.stringify {Lines: lines, CaretColumn: bp.column - prefix.length, FileName: @editor.getPath()}
 
-      jQuery.ajax
+      $.ajax
         type: "POST"
         url: "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getcompletiondata"
         data: ccreq

@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "fuzzaldrin": "*",
-    "jquery": "*",
     "shelljs": "*"
   }
 }
