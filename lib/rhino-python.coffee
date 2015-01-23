@@ -20,6 +20,7 @@ module.exports = RhinoPython =
   editorSubscription: null
   autocomplete: null
   providers: []
+  rhinoPath: null
 
   #"activationCommands": {
   #  "atom-workspace": "rhino-python:toggle"
@@ -95,6 +96,7 @@ module.exports = RhinoPython =
 
   rhinoIsListening: =>
     isListening = false
+    pathToRhino = atom.config.get 'rhino-python.rhinoPath'
     rhinoUrl = "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/ping"
     try
       $.ajax
@@ -102,21 +104,23 @@ module.exports = RhinoPython =
         url: rhinoUrl
         retryLimit: 0
         success: (response) ->
-          console.log response.msg
-          isListening = /Talk to me/.test response.msg
+          if /Rhinoceros.app$/.test response.msg
+            pathToRhino = response.msg
+          isListening = true
         error: (response) ->
           #if /^NetworkError/.test response.statusText
           console.log "error:", response
         dataType: "json"
         async: false
     finally
+      @rhinoPath = pathToRhino
       return isListening
 
   bringRhinoToFront: =>
-    #rhino = shelljs.exec("open /Users/acormier/Library/Developer/Xcode/DerivedData/MacRhino-eyizkxchsvxtptaqlkvbexthtwuy/Build/Products/Debug/Rhinoceros.app", async: true)
-    rhinoPath = "open #{ atom.config.get 'rhino-python.rhinoPath'}"
-    console.log "bringRhinoToFront: #{rhinoPath}"
-    rhino = shelljs.exec(rhinoPath, async: true, (code, output) ->
-      console.log "bringRhinoToFront: exit code: #{code}"
-      console.log "bringRhinoToFront: output: #{output}" unless not output
-    )
+    if @rhinoPath
+      #rhino = shelljs.exec("open /Users/acormier/Library/Developer/Xcode/DerivedData/MacRhino-eyizkxchsvxtptaqlkvbexthtwuy/Build/Products/Debug/Rhinoceros.app", async: true)
+      console.log "bringRhinoToFront: open #{@rhinoPath}"
+      rhino = shelljs.exec("open #{@rhinoPath}", async: true, (code, output) ->
+        console.log "bringRhinoToFront: exit code: #{code}"
+        console.log "bringRhinoToFront: output: #{output}" unless not output
+      )
