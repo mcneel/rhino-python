@@ -1,21 +1,27 @@
 # See https://atom.io/docs/latest/creating-a-package#menus for more details
-'context-menu':
-  'atom-text-editor': [
-    {
-      'label': 'RhinoPython'
-      'submenu': [
-        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'}
-      ]
-    }
-  ]
+
+# comment out the next 'menu' block and uncomment the other 'menu' block below to add a Rhino top menu
+# note: to toggle comments select some lines and press cmd-/
+
 'menu': [
   {
     'label': 'Packages'
     'submenu': [
       'label': 'RhinoPython'
       'submenu': [
-        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'}
+        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'},
+        {label: 'Open autocomplete window', command: 'autocomplete-plus:activate'}
       ]
     ]
   }
 ]
+
+# 'menu': [
+#   {
+#     'label': 'Rhino'
+#     'submenu': [
+#       {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'},
+#       {label: 'Open autocomplete window', command: 'autocomplete-plus:activate'}
+#     ]
+#   }
+# ]
