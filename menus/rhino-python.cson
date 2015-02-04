@@ -25,3 +25,13 @@
 #     ]
 #   }
 # ]
+
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'RhinoPython'
+      'submenu': [
+        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'}
+      ]
+    }
+  ]
