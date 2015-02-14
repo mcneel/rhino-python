@@ -6,10 +6,17 @@
   "repository": "https://github.com/mcneel/rhino-python",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=0.179.0"
   },
   "dependencies": {
     "fuzzaldrin": "*",
     "shelljs": "*"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "1.0.0": "provide"
+      }
+    }
   }
 }

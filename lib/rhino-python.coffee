@@ -3,63 +3,77 @@
 {$} = require 'atom'
 shelljs = require "shelljs"
 
-module.exports = RhinoPython =
+module.exports =
   config:
     httpPort:
       title: 'Port Number'
       description: 'Port number that Rhino listens on for http requests.  NOTE: has to match the port number configured in Rhinoceros.'
       type: 'integer'
       default: 8080
-    rhinoPath:
-      title: 'Rhinoceros Path'
-      description: 'Rhinoceros application path.  ex: /Applications/Rhinoceros.app'
-      type: 'string'
-      default: '/Applications/Rhinoceros.app'
+
+  provider: null
+  ready: false
+
+  activate: ->
+    @ready = true
+
+  deactivate: ->
+    @provider = null
+
+  getProvider: ->
+      return @provider if @provider?
+      RhinoProvider = require('./rhino-autocomplete-plus-python-provider')
+      @provider = new RhinoProvider()
+      return @provider
+  provide: ->
+    return {provider: @getProvider()}
+
 
   #rhinoPythonView: null
-  editorSubscription: null
-  autocomplete: null
-  providers: []
-  rhinoPath: null
+  #editorSubscription: null
+  #autocomplete: null
+  #providers: []
 
   #"activationCommands": {
   #  "atom-workspace": "rhino-python:toggle"
   #},
   #"activationEvents": ["rhino-python:saveAndRunInRhino"],
-  activate: (state) ->
-    #@rhinoPythonView = new RhinoPythonView(state.rhinoPythonViewState)
-    atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
-    #atom.workspaceView.command "rhino-python:rhinoIsListening", => @rhinoIsListening()
+  # activate: (state) ->
+  #   #@rhinoPythonView = new RhinoPythonView(state.rhinoPythonViewState)
+  #   #atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
+  #   atom.commands.add "atom-workspace", "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
+  #   #atom.workspaceView.command "rhino-python:rhinoIsListening", => @rhinoIsListening()
+  #
+  #   atom.packages.activatePackage("autocomplete-plus")
+  #     .then (pkg) =>
+  #       @autocomplete = pkg.mainModule
+  #       return unless @autocomplete?
+  #       Provider = (require './rhino-autocomplete-plus-python-provider').ProviderClass(@autocomplete.Provider, @autocomplete.Suggestion)
+  #       return unless Provider?
+  #       @editorSubscription = atom.workspace.observeTextEditors((editor) => @registerProvider(Provider, editor))
 
-    atom.packages.activatePackage("autocomplete-plus")
-      .then (pkg) =>
-        @autocomplete = pkg.mainModule
-        return unless @autocomplete?
-        Provider = (require './rhino-autocomplete-plus-python-provider').ProviderClass(@autocomplete.Provider, @autocomplete.Suggestion)
-        return unless Provider?
-        @editorSubscription = atom.workspace.observeTextEditors((editor) => @registerProvider(Provider, editor))
+  # registerProvider: (Provider, editor) ->
+  #   return unless Provider?
+  #   return unless editor?
+  #   editorView = atom.views.getView(editor)
+  #   return unless editorView?
+  #   if not editorView.mini
+  #     provider = new Provider(editor)
+  #     @autocomplete.registerProviderForEditor(provider, editor)
+  #     @providers.push(provider)
 
-  registerProvider: (Provider, editor) ->
-    return unless Provider?
-    return unless editor?
-    editorView = atom.views.getView(editor)
-    return unless editorView?
-    if not editorView.mini
-      provider = new Provider(editor)
-      @autocomplete.registerProviderForEditor(provider, editor)
-      @providers.push(provider)
-
-  deactivate: ->
-    #@rhinoPythonView.destroy()
-    @editorSubscription?.off()
-    @editorSubscription = null
-    @providers.forEach (provider) =>
-      @autocomplete.unregisterProvider provider
-    @providers = []
+  # deactivate: ->
+  #   #@rhinoPythonView.destroy()
+  #   @editorSubscription?.off()
+  #   @editorSubscription = null
+  #   @providers.forEach (provider) =>
+  #     @autocomplete.unregisterProvider provider
+  #   @providers = []
 
   #serialize: ->
   #  rhinoPythonViewState: @rhinoPythonView.serialize()
 
+  rhinoPath: null
   saveAndRunInRhino: ->
     rhinoIsntListeningMsg = "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
     editor = atom.workspace.getActiveTextEditor()
@@ -96,7 +110,6 @@ module.exports = RhinoPython =
 
   rhinoIsListening: =>
     isListening = false
-    pathToRhino = atom.config.get 'rhino-python.rhinoPath'
     rhinoUrl = "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/ping"
     try
       $.ajax
@@ -113,12 +126,11 @@ module.exports = RhinoPython =
         dataType: "json"
         async: false
     finally
-      @rhinoPath = pathToRhino
+      @rhinoPath = pathToRhino if pathToRhino?
       return isListening
 
   bringRhinoToFront: =>
     if @rhinoPath
-      #rhino = shelljs.exec("open /Users/acormier/Library/Developer/Xcode/DerivedData/MacRhino-eyizkxchsvxtptaqlkvbexthtwuy/Build/Products/Debug/Rhinoceros.app", async: true)
       console.log "bringRhinoToFront: open #{@rhinoPath}"
       rhino = shelljs.exec("open #{@rhinoPath}", async: true, (code, output) ->
         console.log "bringRhinoToFront: exit code: #{code}"
