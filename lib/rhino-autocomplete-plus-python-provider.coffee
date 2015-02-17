@@ -1,5 +1,6 @@
 {BufferedProcess, $}  = require "atom"
 fuzz = require "fuzzaldrin"
+{MessagePanelView, LineMessageView, PlainMessageView} = require 'atom-message-panel'
 
 exports.fetchedCompletionData = []
 
@@ -8,6 +9,7 @@ ProviderClass: (Provider, Suggestion) ->
   class RhinoAutocompletePlusPythonProvider extends Provider
     exclusive: true
     wordRegex: /[\s\.]\b[a-zA-Z0-9_-]*\b$/ # word following a dot or space
+    messages: null
 
     getInstance: ->
       return this
@@ -27,6 +29,37 @@ ProviderClass: (Provider, Suggestion) ->
           prefix = match[0][0...prefixOffset] if range.start.isLessThan(selectionRange.start)
 
       return prefix
+
+    getDocString: ->
+      return unless @fileIsPython()
+      console.log 'getDocString debug'
+      # bp = @editor.getCursorBufferPosition()
+      # lines = @editor.getTextInBufferRange([[0,0], [bp.row, bp.column]]).split "\n"
+      # ccreq = JSON.stringify {Lines: lines, CaretColumn: bp.column, FileName: @editor.getPath()}
+      # docString = null
+      # $.ajax
+      #   type: "POST"
+      #   url: "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getdocstring"
+      #   data: ccreq
+      #   retryLimit: 0
+      #   success: (data) ->
+      #     if not /^no completion data/.test data
+      #       docString = data
+      #     docString = data.ds
+      #     console.log 'docString', docString
+      #   error: (data) ->
+      #     if /^NetworkError/.test data.statusText
+      #       alert("Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino.")
+      #     else
+      #       if not /^no completion data/.test data.responseText
+      #         console.log "error:", data
+      #   contentType: "application/json"
+      #   dataType: "json"
+      #   async: false
+      #   timeout: 3000
+      #
+      # if docString?
+      #   @showDocString(docString)
 
     buildSuggestions: ->
       return unless @fileIsPython()
@@ -48,6 +81,7 @@ ProviderClass: (Provider, Suggestion) ->
       # then fetch a new list of possible words from Rhino
       return unless lines.length and /.+[\s\.]$/.test lines[lines.length-1]
 
+      # @todo: prefix.length is always 0 no?
       last_dot_or_space_column = bp.column - prefix.length
       ccreq = JSON.stringify {Lines: lines, CaretColumn: bp.column - prefix.length, FileName: @editor.getPath()}
 
@@ -74,3 +108,27 @@ ProviderClass: (Provider, Suggestion) ->
 
       suggestions = (exports.fetchedCompletionData).map (cd) => new Suggestion(this, prefix:"", word: cd.Name)
       return suggestions
+
+    # showDocString: (ds) ->
+    #   if @messages?
+    #     @messages.close()
+    #     @messages = null
+    #
+    #   [first, ...] = ds.split '\n'
+    #   rest = ds.split('\n')[2..]
+    #   @messages = new MessagePanelView
+    #     title: first
+    #
+    #   @messages.clear()
+    #   @messages.add new PlainMessageView
+    #       #message: "<![CDATA[" + ds + "]]"
+    #       # @todo: map each line into a <div>
+    #       message: "doh"
+    #
+    #       <div class="panel-body padded" style="overflow-y: scroll; max-height: 170px;">
+    #         <div class="plain-message" is="space-pen-div">doh</div>
+    #       </div>
+    #
+    #       #message: """<textarea class="panel-body plain-message" rows="#{rest.length}" style="width:100%">#{rest.join('\n')}</textarea>"""
+    #       raw: true
+    #   @messages.attach()

@@ -27,17 +27,29 @@ module.exports = RhinoPython =
   #},
   #"activationEvents": ["rhino-python:saveAndRunInRhino"],
   activate: (state) ->
+    console.log 'state', state
     #@rhinoPythonView = new RhinoPythonView(state.rhinoPythonViewState)
     atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
-    #atom.workspaceView.command "rhino-python:rhinoIsListening", => @rhinoIsListening()
 
     atom.packages.activatePackage("autocomplete-plus")
       .then (pkg) =>
         @autocomplete = pkg.mainModule
         return unless @autocomplete?
+        console.log 'before Provider'
         Provider = (require './rhino-autocomplete-plus-python-provider').ProviderClass(@autocomplete.Provider, @autocomplete.Suggestion)
         return unless Provider?
+        console.log 'after Provider'
         @editorSubscription = atom.workspace.observeTextEditors((editor) => @registerProvider(Provider, editor))
+
+    #ac+ doesn't fire when "(" is typed so create a command for now
+    console.log 'activate rhino-python'
+    atom.workspaceView.command "rhino-python:getDocString", => @getDocString()
+    atom.workspaceView.command "rhino-python:deactivate", => @deactivate()
+    atom.workspaceView.command "rhino-python:activate", => @activate()
+
+  getDocString: ->
+    console.log 'rhino-python getDocString', @providers
+    @providers[0].getDocString()
 
   registerProvider: (Provider, editor) ->
     return unless Provider?
@@ -50,12 +62,12 @@ module.exports = RhinoPython =
       @providers.push(provider)
 
   deactivate: ->
-    #@rhinoPythonView.destroy()
     @editorSubscription?.off()
     @editorSubscription = null
     @providers.forEach (provider) =>
       @autocomplete.unregisterProvider provider
     @providers = []
+    console.log 'providers', @providers
 
   #serialize: ->
   #  rhinoPythonViewState: @rhinoPythonView.serialize()

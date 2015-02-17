@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "fuzzaldrin": "*",
-    "shelljs": "*"
+    "shelljs": "*",
+    "atom-message-panel": "1.2.0"
   }
 }
