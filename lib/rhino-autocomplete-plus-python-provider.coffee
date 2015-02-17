@@ -129,7 +129,7 @@ ProviderClass: (Provider, Suggestion) ->
       rest = _.reject rest, (s) -> /^(\s|&nbsp;)*$/.test s
 
       rest_html = _.map rest, (ln) -> """<div class="plain-message" is="space-pen-div" style="font-family:courier">#{ln}</div>"""
-      msg = """<div class="panel-body" style="overflow-y: scroll; max-height: 170px;">#{rest_html.join('\n')}</div>"""
+      msg = """<div class="panel-body padded" style="overflow-y: scroll; max-height: 170px;">#{rest_html.join('\n')}</div>"""
       #msg = """<div class="panel-body padded" style="overflow-y: scroll; max-height: 170px;"><textarea class="plain-message" is="space-pen-div" rows="#{rest.length}" style="width:100%">#{rest.join('\n')}</textarea></div>"""
 
       @messages = new MessagePanelView
