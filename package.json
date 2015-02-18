@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "fuzzaldrin": "*",
-    "shelljs": "*"
+    "shelljs": "*",
+    "atom-message-panel": "1.2.0",
+    "underscore": "1.7.0"
   },
   "providedServices": {
     "autocomplete.provider": {
