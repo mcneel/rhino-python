@@ -10,11 +10,6 @@ module.exports = RhinoPython =
       description: 'Port number that Rhino listens on for http requests.  NOTE: has to match the port number configured in Rhinoceros.'
       type: 'integer'
       default: 8080
-    rhinoPath:
-      title: 'Rhinoceros Path'
-      description: 'Rhinoceros application path.  ex: /Applications/Rhinoceros.app'
-      type: 'string'
-      default: '/Applications/Rhinoceros.app'
 
   #rhinoPythonView: null
   editorSubscription: null
@@ -72,6 +67,7 @@ module.exports = RhinoPython =
   #serialize: ->
   #  rhinoPythonViewState: @rhinoPythonView.serialize()
 
+  rhinoPath: null
   saveAndRunInRhino: ->
     rhinoIsntListeningMsg = "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
     editor = atom.workspace.getActiveTextEditor()
@@ -83,8 +79,8 @@ module.exports = RhinoPython =
     if not @rhinoIsListening()
       alert(rhinoIsntListeningMsg)
       return
-
-    @bringRhinoToFront()
+    else
+      @bringRhinoToFront()
 
     rpfreq = JSON.stringify {FileName: editor.getPath()}
     rhinoUrl = "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/runpythonscriptfile"
@@ -108,7 +104,6 @@ module.exports = RhinoPython =
 
   rhinoIsListening: =>
     isListening = false
-    pathToRhino = atom.config.get 'rhino-python.rhinoPath'
     rhinoUrl = "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/ping"
     try
       $.ajax
@@ -117,7 +112,7 @@ module.exports = RhinoPython =
         retryLimit: 0
         success: (response) ->
           if /Rhinoceros.app$/.test response.msg
-            pathToRhino = response.msg
+            pathToRhino = response.msg unless response.msg is "Talk to me"
           isListening = true
         error: (response) ->
           #if /^NetworkError/.test response.statusText
