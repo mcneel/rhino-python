@@ -24,7 +24,9 @@ module.exports =
       RhinoProvider = require('./rhino-autocomplete-plus-python-provider')
       @provider = new RhinoProvider()
       return @provider
+
   provide: ->
+    console.log 'provide'
     return {provider: @getProvider()}
 
   #rhinoPythonView: null
@@ -81,7 +83,7 @@ module.exports =
 
   getDocString: ->
     console.log 'rhino-python getDocString', @providers
-    @providers[0].getDocString()
+    #@providers[0].getDocString()
 
   rhinoPath: null
   saveAndRunInRhino: ->
