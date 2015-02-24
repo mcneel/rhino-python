@@ -8,5 +8,5 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
 'atom-workspace':
-  'ctrl-alt-r': 'rhino-python:saveAndRunInRhino',
+  'ctrl-alt-r': 'rhino-python:saveAndRunInRhino'
   'shift-ctrl-space': 'autocomplete-plus:activate'

@@ -1,4 +1,3 @@
-#RhinoAutocompletePlusPythonProvider = require './rhino-autocomplete-plus-python-provider'
 {$} = require 'atom'
 shelljs = require "shelljs"
 
@@ -15,6 +14,7 @@ module.exports =
 
   activate: ->
     @ready = true
+    atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
 
   deactivate: ->
     @provider = null
@@ -28,62 +28,6 @@ module.exports =
   provide: ->
     console.log 'provide'
     return {provider: @getProvider()}
-
-  #rhinoPythonView: null
-  #editorSubscription: null
-  #autocomplete: null
-  #providers: []
-
-  #"activationCommands": {
-  #  "atom-workspace": "rhino-python:toggle"
-  #},
-  #"activationEvents": ["rhino-python:saveAndRunInRhino"],
-
-  #activate: (state) ->
-  #  console.log 'state', state
-  #  #@rhinoPythonView = new RhinoPythonView(state.rhinoPythonViewState)
-  #  atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
-
-  #  atom.packages.activatePackage("autocomplete-plus")
-  #    .then (pkg) =>
-  #      @autocomplete = pkg.mainModule
-  #      return unless @autocomplete?
-  #      console.log 'before Provider'
-  #      Provider = (require './rhino-autocomplete-plus-python-provider').ProviderClass(@autocomplete.Provider, @autocomplete.Suggestion)
-  #      return unless Provider?
-  #      console.log 'after Provider'
-  #      @editorSubscription = atom.workspace.observeTextEditors((editor) => @registerProvider(Provider, editor))
-
-  #  #ac+ doesn't fire when "(" is typed so create a command for now
-  #  console.log 'activate rhino-python'
-  #  atom.workspaceView.command "rhino-python:getDocString", => @getDocString()
-  #  atom.workspaceView.command "rhino-python:deactivate", => @deactivate()
-  #  atom.workspaceView.command "rhino-python:activate", => @activate()
-
-  #registerProvider: (Provider, editor) ->
-  #  return unless Provider?
-  #  return unless editor?
-  #  editorView = atom.views.getView(editor)
-  #  return unless editorView?
-  #  if not editorView.mini
-  #    provider = new Provider(editor)
-  #    @autocomplete.registerProviderForEditor(provider, editor)
-  #    @providers.push(provider)
-
-  #deactivate: ->
-  #  @editorSubscription?.off()
-  #  @editorSubscription = null
-  #  @providers.forEach (provider) =>
-  #    @autocomplete.unregisterProvider provider
-  #  @providers = []
-  #  console.log 'providers', @providers
-
-  #serialize: ->
-  #  rhinoPythonViewState: @rhinoPythonView.serialize()
-
-  getDocString: ->
-    console.log 'rhino-python getDocString', @providers
-    #@providers[0].getDocString()
 
   rhinoPath: null
   saveAndRunInRhino: ->
@@ -122,6 +66,7 @@ module.exports =
 
   rhinoIsListening: =>
     isListening = false
+    pathToRhino = null
     rhinoUrl = "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/ping"
     try
       $.ajax

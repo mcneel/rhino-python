@@ -13,18 +13,16 @@ describe "RhinoPython", ->
     atom.workspaceView = new WorkspaceView
     activationPromise = atom.packages.activatePackage('rhino-python')
 
-  describe "when the rhino-python:toggle event is triggered", ->
-    it "attaches and then detaches the view", ->
-      expect(atom.workspaceView.find('.rhino-python')).not.toExist()
-
-      # This is an activation event, triggering it will cause the package to be
-      # activated.
-      atom.commands.dispatch atom.workspaceView.element, 'rhino-python:toggle'
-
-      waitsForPromise ->
-        activationPromise
-
-      runs ->
-        expect(atom.workspaceView.find('.rhino-python')).toExist()
-        atom.commands.dispatch atom.workspaceView.element, 'rhino-python:toggle'
-        expect(atom.workspaceView.find('.rhino-python')).not.toExist()
+  # describe "when the rhino-python:toggle event is triggered", ->
+  #   it "attaches and then detaches the view", ->
+  #     expect(atom.workspaceView.find('.rhino-python')).not.toExist()
+  #
+  #     # This is an activation event, triggering it will cause the package to be
+  #     # activated.
+  #     atom.commands.dispatch atom.workspaceView.element, 'rhino-python:toggle'
+  #
+  #     waitsForPromise ->
+  #       activationPromise
+  #
+  #     runs ->
+  #       expect(atom.workspaceView.find('.rhino-python')).toExist()

@@ -10,6 +10,7 @@ class RhinoProvider
   id: 'rhino-python-rhinoprovider'
   selector: '.source.python'
   blacklist: '.source.python .comment'
+
   requestHandler: (options) ->
     lines = options.buffer.getLines()[0..options.position.row]
     return [] unless lines.length
@@ -19,29 +20,21 @@ class RhinoProvider
     lines = lines[0..lines.length-1]
     lines.push cursorLine
 
-    lastWordDirectlyInFrontOfCursorPrecededBySpaceDotParen = /[\s\.]\b[a-zA-Z0-9_-]*\b$/
-    match = lastWordDirectlyInFrontOfCursorPrecededBySpaceDotParen.exec cursorLine
-    if match?
-      if exports.fetchedCompletionData.length == 0
-        return []
-      qry = match[0] if match and match.length == 1
-      qry = qry.replace /^[\s\.]/, ''
-      suggestions = fuzz.filter exports.fetchedCompletionData, qry, key: 'word'
-      #console.log 'sugg:', qry, suggestions, exports.fetchedCompletionData
+    if @endsWithWordThatIsPrecededBySpaceOrDot cursorLine
+      suggestions = fuzz.filter exports.fetchedCompletionData, options.prefix, key: 'word'
       return suggestions.map (s) -> {word: s.word, prefix: options.prefix, label: s.label, renderLabelAsHtml: true}
 
-    return [] unless lines.length and /.+[\s\.(]$/.test cursorLine #lines[lines.length-1]
+    return [] unless @rhinoNeedsToBeQueriedForCompletionData lines, cursorLine
 
-    console.log 'l:', cursorLine
     if /.+\($/.test cursorLine
       ds = @getDocString(options, lines)
-      console.log 'ds:', ds
       if ds?
         @showDocString ds
         return []
 
     ccreq = JSON.stringify {Lines: lines, CaretColumn: options.position.column, FileName: options.editor.getPath()}
 
+    suggestions = []
     $.ajax
       type: "POST"
       url: "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getcompletiondata"
@@ -50,11 +43,9 @@ class RhinoProvider
       success: (data) ->
         if not /^no completion data/.test data
           suggestions = data.map (s) =>
-            {word: s.Name, prefix: '', label: '<span style="color: red"><- Rhino</span>', renderLabelAsHtml: true}
-          exports.fetchedCompletionData = suggestions if suggestions?
-          #console.log 'sugg:', suggestions
+            {word: s.Name, prefix: '', label: '<span style="color: gray"><- Rhino</span>', renderLabelAsHtml: true}
         else
-          exports.fetchedCompletionData = []
+          console.log data
       error: (data) ->
         if /^NetworkError/.test data.statusText
           alert("Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino.")
@@ -66,18 +57,17 @@ class RhinoProvider
       async: false
       timeout: 3000
 
-    return exports.fetchedCompletionData[..]
+    exports.fetchedCompletionData = suggestions
+    return suggestions
 
-  dispose: -> console.log 'dispose rhino-python'
-  messages: null
+  endsWithWordThatIsPrecededBySpaceOrDot: (cursorLine) ->
+    /[\s\.]\b[a-zA-Z0-9_-]*\b$/.test cursorLine
 
+  rhinoNeedsToBeQueriedForCompletionData: (lines, cursorLine) ->
+    lines.length and /.+[\s\.(]$/.test cursorLine
 
   getDocString: (options, lines) ->
-    #return unless @fileIsPython()
-    #console.log 'getDocString debug'
-    #bp = @editor.getCursorBufferPosition()
-    #lines = @editor.getTextInBufferRange([[0,0], [bp.row, bp.column]]).split "\n"
-    lines[lines.length-1] = lines[lines.length-1].replace /\($/, '' 
+    lines[lines.length-1] = lines[lines.length-1].replace /\($/, ''
     ccreq = JSON.stringify {Lines: lines, CaretColumn: options.position.column, FileName: options.editor.getPath()}
     docString = null
     $.ajax
@@ -89,7 +79,6 @@ class RhinoProvider
         if not /^no completion data/.test data
           docString = data
         docString = data.ds
-        console.log 'docString', docString
       error: (data) ->
         if /^NetworkError/.test data.statusText
           alert("Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino.")
@@ -102,12 +91,11 @@ class RhinoProvider
       timeout: 3000
 
     return docString
-    # if docString?
-    #   @showDocString(docString)
 
 
+  # todo: UI stuff doesn't belong here
+  messages: null
   showDocString: (ds) ->
-    #console.log _.map [10,20,30], (i) -> i * 2
     if @messages?
       @messages.close()
       @messages = null
@@ -139,3 +127,6 @@ class RhinoProvider
         raw: true
         #className: 'panel-body padded'
     @messages.attach()
+
+  dispose: ->
+    console.log 'dispose rhino-python'

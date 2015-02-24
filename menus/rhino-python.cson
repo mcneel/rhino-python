@@ -10,10 +10,7 @@
       'label': 'RhinoPython'
       'submenu': [
         {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino'},
-        {label: 'Open autocomplete window', command: 'autocomplete-plus:activate'},
-        {label: 'Get doc string', command: 'rhino-python:getDocString'},
-        {label: 'deactivate', command: 'rhino-python:deactivate'},
-        {label: 'activate', command: 'rhino-python:activate'}
+        {label: 'Open autocomplete window', command: 'autocomplete-plus:activate'}
       ]
     ]
   }
