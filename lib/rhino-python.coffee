@@ -26,7 +26,6 @@ module.exports =
       return @provider
 
   provide: ->
-    console.log 'provide'
     return {provider: @getProvider()}
 
   rhinoPath: null

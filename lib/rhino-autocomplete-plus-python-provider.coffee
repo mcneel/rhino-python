@@ -2,14 +2,18 @@
 _ = require 'underscore'
 fuzz = require "fuzzaldrin"
 {MessagePanelView, LineMessageView, PlainMessageView} = require 'atom-message-panel'
-
-exports.fetchedCompletionData = []
+ttr = require './talk-to-rhino'
 
 module.exports =
 class RhinoProvider
   id: 'rhino-python-rhinoprovider'
   selector: '.source.python'
   blacklist: '.source.python .comment'
+  providerblacklist: 'autocomplete-plus-fuzzyprovider'
+  @fetchedCompletionData: []
+
+  setFetchedCompletionData: (data) ->
+    RhinoProvider.fetchedCompletionData = data
 
   requestHandler: (options) ->
     lines = options.buffer.getLines()[0..options.position.row]
@@ -21,81 +25,35 @@ class RhinoProvider
     lines.push cursorLine
 
     if @endsWithWordThatIsPrecededBySpaceOrDot cursorLine
-      suggestions = fuzz.filter exports.fetchedCompletionData, options.prefix, key: 'word'
+      suggestions = fuzz.filter RhinoProvider.fetchedCompletionData, options.prefix, key: 'word'
       return suggestions.map (s) -> {word: s.word, prefix: options.prefix, label: s.label, renderLabelAsHtml: true}
 
     return [] unless @rhinoNeedsToBeQueriedForCompletionData lines, cursorLine
 
-    if /.+\($/.test cursorLine
-      ds = @getDocString(options, lines)
-      if ds?
-        @showDocString ds
-        return []
+    if @endsWithOpenParen cursorLine
+      @getAndShowDocString(options, lines)
+      return []
 
-    ccreq = JSON.stringify {Lines: lines, CaretColumn: options.position.column, FileName: options.editor.getPath()}
+    return ttr.getCompletionData(lines, options.position.column, options.editor.getPath(), @setFetchedCompletionData)
 
-    suggestions = []
-    $.ajax
-      type: "POST"
-      url: "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getcompletiondata"
-      data: ccreq
-      retryLimit: 0
-      success: (data) ->
-        if not /^no completion data/.test data
-          suggestions = data.map (s) =>
-            {word: s.Name, prefix: '', label: '<span style="color: gray"><- Rhino</span>', renderLabelAsHtml: true}
-        else
-          console.log data
-      error: (data) ->
-        if /^NetworkError/.test data.statusText
-          alert("Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino.")
-        else
-          if not /^no completion data/.test data.responseText
-            console.log "error:", data
-      contentType: "application/json"
-      dataType: "json"
-      async: false
-      timeout: 3000
+  endsWithOpenParen: (text) ->
+    /.+\($/.test text
 
-    exports.fetchedCompletionData = suggestions
-    return suggestions
+  endsWithWordThatIsPrecededBySpaceOrDot: (text) ->
+    /[\s\.]\b[a-zA-Z0-9_-]*\b$/.test text
 
-  endsWithWordThatIsPrecededBySpaceOrDot: (cursorLine) ->
-    /[\s\.]\b[a-zA-Z0-9_-]*\b$/.test cursorLine
+  rhinoNeedsToBeQueriedForCompletionData: (lines, text) ->
+    lines.length and /.+[\s\.(]$/.test text
 
-  rhinoNeedsToBeQueriedForCompletionData: (lines, cursorLine) ->
-    lines.length and /.+[\s\.(]$/.test cursorLine
-
-  getDocString: (options, lines) ->
-    lines[lines.length-1] = lines[lines.length-1].replace /\($/, ''
-    ccreq = JSON.stringify {Lines: lines, CaretColumn: options.position.column, FileName: options.editor.getPath()}
-    docString = null
-    $.ajax
-      type: "POST"
-      url: "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getdocstring"
-      data: ccreq
-      retryLimit: 0
-      success: (data) ->
-        if not /^no completion data/.test data
-          docString = data
-        docString = data.ds
-      error: (data) ->
-        if /^NetworkError/.test data.statusText
-          alert("Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino.")
-        else
-          if not /^no completion data/.test data.responseText
-            console.log "error:", data
-      contentType: "application/json"
-      dataType: "json"
-      async: false
-      timeout: 3000
-
-    return docString
+  getAndShowDocString: (options, lines) ->
+    ttr.getDocString options, lines
+      .done (ds) ->
+        RhinoProvider.showDocString ds
 
 
   # todo: UI stuff doesn't belong here
   messages: null
-  showDocString: (ds) ->
+  @showDocString: (ds) ->
     if @messages?
       @messages.close()
       @messages = null
