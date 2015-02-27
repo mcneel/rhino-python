@@ -10,10 +10,7 @@ class RhinoProvider
   selector: '.source.python'
   blacklist: '.source.python .comment'
   providerblacklist: 'autocomplete-plus-fuzzyprovider'
-  @fetchedCompletionData: []
-
-  setFetchedCompletionData: (data) ->
-    RhinoProvider.fetchedCompletionData = data
+  @cachedSuggestions = []
 
   requestHandler: (options) ->
     lines = options.buffer.getLines()[0..options.position.row]
@@ -25,7 +22,7 @@ class RhinoProvider
     lines.push cursorLine
 
     if @endsWithWordThatIsPrecededBySpaceOrDot cursorLine
-      suggestions = fuzz.filter RhinoProvider.fetchedCompletionData, options.prefix, key: 'word'
+      suggestions = fuzz.filter RhinoProvider.cachedSuggestions, options.prefix, key: 'word'
       return suggestions.map (s) -> {word: s.word, prefix: options.prefix, label: s.label, renderLabelAsHtml: true}
 
     return [] unless @rhinoNeedsToBeQueriedForCompletionData lines, cursorLine
@@ -34,7 +31,8 @@ class RhinoProvider
       @getAndShowDocString(options, lines)
       return []
 
-    return ttr.getCompletionData(lines, options.position.column, options.editor.getPath(), @setFetchedCompletionData)
+    return ttr.getCompletionData lines, options.position.column, options.editor.getPath(),
+      (suggestions) -> RhinoProvider.cachedSuggestions = suggestions
 
   endsWithOpenParen: (text) ->
     /.+\($/.test text
