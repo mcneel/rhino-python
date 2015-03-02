@@ -16,7 +16,7 @@ module.exports =
   activate: ->
     @ready = true
     atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
-    atom.workspaceView.command "rhino-python:saveAndRunInRhino2", => @saveAndRunInRhino2()
+    atom.workspaceView.command "rhino-python:saveAndRunInRhinoFromTreeView", => @saveAndRunInRhinoFromTreeView()
 
   deactivate: ->
     @provider = null
@@ -33,6 +33,7 @@ module.exports =
   saveAndRunInRhino: ->
     rhinoIsntListeningMsg = "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
     editor = atom.workspace.getActiveTextEditor()
+    console.log 'path', editor.getPath()
     if editor and not /.py$/.test editor.getPath()
       alert("Can't save and run.  Not a python file.")
       return
@@ -59,7 +60,14 @@ module.exports =
       console.log "bringRhinoToFront: output: #{output}" unless not output
     )
 
-  saveAndRunInRhino2: ->
+  saveAndRunInRhinoFromTreeView: ->
     #s = document.querySelectorAll('[is="tree-view-file"] .selected [data-name$=".py"]')
-    fileName = document.querySelector('[is="tree-view-file"].selected span').attributes["data-path"].value
-    console.log 'hey', fileName, atom.workspace.getActiveTextEditor().getPath()
+    selected = document.querySelectorAll('[is="tree-view-file"].selected span')
+    if selected.length isnt 1
+      alert('This command can only be run when exactly 1 file is selected')
+      return
+    fileName = selected[0].attributes["data-path"].value
+    atom.workspace.open fileName
+      .done (o) =>
+        console.log 'o', typeof o, o
+        @saveAndRunInRhino()

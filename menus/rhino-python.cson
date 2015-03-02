@@ -39,7 +39,7 @@
     {
       'label': 'RhinoPython'
       'submenu':[
-        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhino2'}
+        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhinoFromTreeView'}
       ]
     }
   ]
