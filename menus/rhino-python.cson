@@ -35,3 +35,11 @@
       ]
     }
   ]
+  '[is="tree-view-file"] [data-name$=".py"]': [
+    {
+      'label': 'RhinoPython'
+      'submenu':[
+        {label: 'Save and Run in Rhino', command: 'rhino-python:saveAndRunInRhinoFromTreeView'}
+      ]
+    }
+  ]
