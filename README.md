@@ -26,12 +26,19 @@ Code completion support for your Python scripts that are executed by [Rhinoceros
   - For the next line type **```rs.AddCircle(Point3d.Origin, 5.0)```** and again notice the completion window after each <kbd>.</kbd> and the doc string panel after the <kbd>(</kbd>. Keep typing until the desired data is highlighted in the completion window and press the <kbd>tab</kbd> key to accept.
   - To send the file to Rhino for execution press the <kbd>ctrl</kbd>-<kbd>alt</kbd>-<kbd>r</kbd> keys.
 
-## A useful workflow
+## A useful workflow to manage your scripts
 
-ln -s ~/Library/Application\ Support/McNeel/Rhinoceros/MacPlugIns/ironpython/settings/samples samples
+  Since rhino-python also provides the ability to launch scripts from Atom it's also easy to centrally manage your scripts.  Especially with symbolic links (described below).  You can view [a one minute screencast] (http://youtu.be/pAxssTpj4g4) or follow the steps below:
 
-The Atom text editor and the rhino-python package are both early releases.  Atom (now at 0.174.0) is evolving rapidly and may introduce breaking changes as it moves towards a 1.0 release so the rhino-python package will need to be updated to keep up with the changes.  We chose Atom because it's a new editor that holds a lot of promise: it is made by the folks at GitHub, is getting a lot of attention,  is cross platform, and is open source.  Let us know what you think ...
-
+  - determine the main folder that will be the root for all your Python scripts (Ex: ~/src/py).
+  - copy your Python files or directories that contain Python files to that directory.  
+  - open a terminal window (Finder: Applications/Utilities/Terminal.app) and go to your root directory and launch Atom.  Launching Atom at the command line opens the current directory in a tree view panel on the left.  
+  **```cd ~/src/py```**  
+  **```atom```**  
+  - if you have files that reside outside this main directory you can link to them with a symbolic link instead of copying them.  For example to create a link to the sample scripts that ship with Rhino type the following:  
+  **```ln -s ~/Library/Application\ Support/McNeel/Rhinoceros/MacPlugIns/ironpython/settings/samples samples```**  
+  - notice how the "samples" directory is now in the Atom three view and has a different folder icon to show that it links to another directory.  If you forget where the real directory is <kbd>ctrl</kbd>+<kbd>click</kbd> on the "samples" directory in Finder and select "Get Info"
+  - you can <kbd>ctrl</kbd>+<kbd>click</kbd> any Python file in the tree view and select "Save and Run in Rhino" from the "RhinoPython" context menu.
 
 
   [1]: https://atom.io
