@@ -2,7 +2,7 @@
 
 Rhino Python provides editor support for writing Python scripts that are executed by Rhinoceros (www.rhino3d.com).
 
-![rhino-python](https://imgflip.com/gif/iba3p)  
+![rhino-python](docs/main.gif)  
 
 IMPORTANT: install the 'autocomplete-plus' package before installing 'rhino-python'.
 
