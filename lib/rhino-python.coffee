@@ -16,6 +16,7 @@ module.exports =
   activate: ->
     @ready = true
     atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
+    atom.workspaceView.command "rhino-python:saveAndRunInRhino2", => @saveAndRunInRhino2()
 
   deactivate: ->
     @provider = null
@@ -57,3 +58,8 @@ module.exports =
       console.log "bringRhinoToFront: exit code: #{code}"
       console.log "bringRhinoToFront: output: #{output}" unless not output
     )
+
+  saveAndRunInRhino2: ->
+    #s = document.querySelectorAll('[is="tree-view-file"] .selected [data-name$=".py"]')
+    fileName = document.querySelector('[is="tree-view-file"].selected span').attributes["data-path"].value
+    console.log 'hey', fileName, atom.workspace.getActiveTextEditor().getPath()
