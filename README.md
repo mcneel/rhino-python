@@ -28,7 +28,7 @@ Code completion support for your Python scripts that are executed by [Rhinoceros
 
 ## A useful workflow to manage your scripts
 
-  Since rhino-python also provides the ability to launch scripts from Atom it's also easy to centrally manage your scripts.  Especially with symbolic links (described below).  You can view [a one minute screencast] (http://youtu.be/pAxssTpj4g4) or follow the steps below:
+  Since rhino-python also provides the ability to launch scripts from Atom it also makes it easy to centrally manage your scripts.  Especially with symbolic links (described below).  You can view [a one minute screencast] (http://youtu.be/pAxssTpj4g4) or follow the steps below:
 
   - determine the main folder that will be the root for all your Python scripts (Ex: ~/src/py).
   - copy your Python files or directories that contain Python files to that directory.  
