@@ -2,7 +2,7 @@
 
 Code completion support for your Python scripts that are executed by [Rhinoceros for Mac] (https://www.rhino3d.com/mac).
 
-![rhino-python](docs/main.gif)  
+![rhino-python](https://raw.githubusercontent.com/mcneel/rhino-python/master/docs/main.gif)  
 
 ## Installation
 
@@ -56,7 +56,7 @@ Experiment with the Autocomplete Plus settings to fine tune your setup:
 Because completion data can come from many providers, the data coming from rhino is labeled "<- Rhino" (right-most column of completion window).  This adds clarity especially if you have the "Enable Built-In Provider" checked in Autocomplete Plus settings.  
 
 In this release getting completion data after "import ", "from ", or "from x import " doesn't work exactly
-the same way as in the embedded editor that's in Rhino for Windows where the completion window opens right after you type the trailing space as in "import ".  In Atom you need to press the first letter of the module you want to import before the completion window opens (ex: "import r").  This is how many other editors work (Visual Studio with Resharper, PyCharm) and it's how the latest release Atom works for now.  This might change in the future and when it does then the completion window will open just like in Rhino for Windows. 
+the same way as in the embedded editor that's in Rhino for Windows where the completion window opens right after you type the trailing space as in "import ".  In Atom you need to press the first letter of the module you want to import before the completion window opens (ex: "import r").  This is how many other editors work (Visual Studio with Resharper, PyCharm) and it's how the latest release Atom works for now.  This might change in the future and when it does then the completion window will open just like in Rhino for Windows.
 
 
   [1]: https://atom.io
