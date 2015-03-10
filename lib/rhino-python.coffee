@@ -33,7 +33,6 @@ module.exports =
   saveAndRunInRhino: ->
     rhinoIsntListeningMsg = "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
     editor = atom.workspace.getActiveTextEditor()
-    console.log 'path', editor.getPath()
     if editor and not /.py$/.test editor.getPath()
       alert("Can't save and run.  Not a python file.")
       return
@@ -54,9 +53,9 @@ module.exports =
         alert(rhinoIsntListeningMsg)
 
   bringRhinoToFront: (rhinoPath) ->
-    console.log "bringRhinoToFront: open #{rhinoPath}"
+    #console.log "bringRhinoToFront: open #{rhinoPath}"
     rhino = shelljs.exec("open #{rhinoPath}", async: true, (code, output) ->
-      console.log "bringRhinoToFront: exit code: #{code}"
+      #console.log "bringRhinoToFront: exit code: #{code}"
       console.log "bringRhinoToFront: output: #{output}" unless not output
     )
 
@@ -69,5 +68,4 @@ module.exports =
     fileName = selected[0].attributes["data-path"].value
     atom.workspace.open fileName
       .done (o) =>
-        console.log 'o', typeof o, o
         @saveAndRunInRhino()

@@ -5,7 +5,6 @@ module.exports =
     return new Promise (resolve) ->
       suggestions = []
       ccreq = JSON.stringify {Lines: lines, CaretColumn: callRhinoPosition.column, FileName: path}
-      console.log 'ccreq:', ccreq
       $.post "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getcompletiondata", ccreq, 'json'
         .then (response) ->
           if /^no completion data/.test response

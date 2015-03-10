@@ -25,7 +25,7 @@ class RhinoProvider
     lineLeftOfCallRhinoPosition = lines[lines.length-1][0..callRhinoPosition.column]
     lines = if lines.length is 1 then [] else lines[0..lines.length-2]
 
-    if @positionsAreEqual callRhinoPosition, RhinoProvider.callRhinoPosition and not @stringIsCallRhinoChar prefix
+    if (@positionsAreEqual callRhinoPosition, RhinoProvider.callRhinoPosition) and (not @stringIsCallRhinoChar prefix)
       return @filterCachedSuggestions prefix
     else
       @clearCache()
