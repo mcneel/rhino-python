@@ -1,10 +1,11 @@
 {$} = require 'atom'
 
 module.exports =
-  getCompletionData: (lines, caretColumn, path, setCached) ->
+  getCompletionData: (lines, callRhinoPosition, path, prefix, clearCache, cache, filter) ->
     return new Promise (resolve) ->
       suggestions = []
-      ccreq = JSON.stringify {Lines: lines, CaretColumn: caretColumn, FileName: path}
+      ccreq = JSON.stringify {Lines: lines, CaretColumn: callRhinoPosition.column, FileName: path}
+      console.log 'ccreq:', ccreq
       $.post "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getcompletiondata", ccreq, 'json'
         .then (response) ->
           if /^no completion data/.test response
@@ -12,29 +13,13 @@ module.exports =
           else
             suggestions = ($.parseJSON response)?.map (cd) =>
               {word: cd.Name, prefix: '', label: '<span style="color: gray"><- Rhino</span>', renderLabelAsHtml: true}
+            console.log "fetched from Rhino: #{suggestions?.length} suggestions"
           suggestions
         .always (newSuggestions) ->
-          setCached(newSuggestions)
-          resolve(newSuggestions)
+          cache(callRhinoPosition, newSuggestions)
+          resolve(if prefix then filter(prefix) else newSuggestions)
         .fail (response) ->
           console.log 'getCompletionData failed:', response
-  # wip: try to remove the setCached callback
-  # getCompletionData: (lines, caretColumn, path) ->
-  #   return new Promise (resolve) ->
-  #     suggestions = []
-  #     ccreq = JSON.stringify {Lines: lines, CaretColumn: caretColumn, FileName: path}
-  #     $.post "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getcompletiondata", ccreq, 'json'
-  #       .then (response) ->
-  #         if /^no completion data/.test response
-  #           console.log response
-  #         else
-  #           suggestions = ($.parseJSON response)?.map (cd) =>
-  #             {word: cd.Name, prefix: '', label: '<span style="color: gray"><- Rhino</span>', renderLabelAsHtml: true}
-  #         suggestions
-  #       .always (newSuggestions) ->
-  #         resolve (newSuggestions)
-  #       .fail (response) ->
-  #         console.log 'getCompletionData failed:', response
 
   getDocString: (options, lines) ->
     lines[lines.length-1] = lines[lines.length-1].replace /\($/, ''

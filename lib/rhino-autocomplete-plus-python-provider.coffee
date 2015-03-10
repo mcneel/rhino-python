@@ -11,43 +11,60 @@ class RhinoProvider
   blacklist: '.source.python .comment'
   providerblacklist: 'autocomplete-plus-fuzzyprovider'
   @cachedSuggestions = []
+  @callRhinoPosition = null
 
   requestHandler: (options) ->
+    prefix = if /\s$/.test options.prefix then ' ' else options.prefix
+    #console.log "options.prefix: **#{options.prefix}**, **#{prefix}**"
     lines = options.buffer.getLines()[0..options.position.row]
     return [] unless lines.length
     cursorLine = lines[lines.length-1][0..options.position.column-1]
     return [] unless cursorLine?
+    callRhinoPosition = @getCallRhinoPosition cursorLine, lines.length-1
+    return [] unless callRhinoPosition
+    lineLeftOfCallRhinoPosition = lines[lines.length-1][0..callRhinoPosition.column]
+    lines = if lines.length is 1 then [] else lines[0..lines.length-2]
 
-    lines = lines[0..lines.length-1]
-    lines.push cursorLine
+    if @positionsAreEqual callRhinoPosition, RhinoProvider.callRhinoPosition and not @stringIsCallRhinoChar prefix
+      return @filterCachedSuggestions prefix
+    else
+      @clearCache()
+      if @stringIsOpenParen prefix
+        lines.push cursorLine
+        @getAndShowDocString(options, lines)
+        return []
+      lines.push lineLeftOfCallRhinoPosition
+      return ttr.getCompletionData lines, callRhinoPosition, options.editor.getPath(),
+        if @stringIsCallRhinoChar prefix then null else prefix,
+        @clearCache,
+        (p, s) -> RhinoProvider.callRhinoPosition = p; RhinoProvider.cachedSuggestions = s,
+        (pfx) => @filterCachedSuggestions pfx
 
-    if @endsWithWordThatIsPrecededBySpaceOrDot cursorLine
-      suggestions = fuzz.filter RhinoProvider.cachedSuggestions, options.prefix, key: 'word'
-      return suggestions.map (s) -> {word: s.word, prefix: options.prefix, label: s.label, renderLabelAsHtml: true}
+  filterCachedSuggestions: (prefix) ->
+    suggestions = fuzz.filter RhinoProvider.cachedSuggestions, prefix, key: 'word'
+    return suggestions.map (s) -> {word: s.word, prefix: prefix, label: s.label, renderLabelAsHtml: true}
 
-    return [] unless @rhinoNeedsToBeQueriedForCompletionData lines, cursorLine
+  stringIsCallRhinoChar: (s) ->
+    /^[\s\.(]$/.test s
+  stringIsOpenParen: (s) ->
+    /^[(]$/.test s
 
-    if @endsWithOpenParen cursorLine
-      @getAndShowDocString(options, lines)
-      return []
+  clearCache: ->
+    RhinoProvider.cachedSuggestions = []
+    RhinoProvider.callRhinoPosition = null
 
-    return ttr.getCompletionData lines, options.position.column, options.editor.getPath(),
-      (suggestions) -> RhinoProvider.cachedSuggestions = suggestions
+  getCallRhinoPosition: (line, row) ->
+    m = line.match /[\s\.(][a-zA-Z0-9_-]*$/
+    if m then {row: row, column: m.index} else null
 
-  endsWithOpenParen: (text) ->
-    /.+\($/.test text
-
-  endsWithWordThatIsPrecededBySpaceOrDot: (text) ->
-    /[\s\.]\b[a-zA-Z0-9_-]*\b$/.test text
-
-  rhinoNeedsToBeQueriedForCompletionData: (lines, text) ->
-    lines.length and /.+[\s\.(]$/.test text
+  positionsAreEqual: (p1, p2) ->
+    return false unless p1 and p2
+    p1.row is p2.row and p1.column is p2.column
 
   getAndShowDocString: (options, lines) ->
     ttr.getDocString options, lines
       .done (ds) ->
         RhinoProvider.showDocString ds
-
 
   # todo: UI stuff doesn't belong here
   messages: null
