@@ -30,7 +30,7 @@ module.exports =
   rhinoIsListening: ->
     return $.getJSON "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/ping"
       .then (response) ->
-        if /Rhinoceros.app$/.test response.msg then [true, response.msg] else false
+        if response.msg? then [true, response.msg] else false
 
   runInRhino: (path) ->
     rpfreq = JSON.stringify {FileName: path}

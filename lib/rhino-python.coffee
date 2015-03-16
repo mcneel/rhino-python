@@ -53,11 +53,13 @@ module.exports =
         alert(rhinoIsntListeningMsg)
 
   bringRhinoToFront: (rhinoPath) ->
-    #console.log "bringRhinoToFront: open #{rhinoPath}"
-    rhino = shelljs.exec("open #{rhinoPath}", async: true, (code, output) ->
-      #console.log "bringRhinoToFront: exit code: #{code}"
-      console.log "bringRhinoToFront: output: #{output}" unless not output
-    )
+    if document.body.classList.contains 'platform-darwin'
+      rhino = shelljs.exec("open #{rhinoPath}", async: true, (code, output) ->
+        #console.log "bringRhinoToFront: exit code: #{code}"
+        console.log "bringRhinoToFront: output: #{output}" unless not output
+      )
+    else # document.body.classList.contains 'platform-win32'
+      console.log "bringRhinoToFront doesn't work on windows yet.  Alt-Tab to Rhino."
 
   saveAndRunInRhinoFromTreeView: ->
     #s = document.querySelectorAll('[is="tree-view-file"] .selected [data-name$=".py"]')
