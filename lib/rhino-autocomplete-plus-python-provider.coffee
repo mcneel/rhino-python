@@ -1,4 +1,4 @@
-{BufferedProcess, $}  = require "atom"
+$ = require "jquery"
 _ = require 'underscore'
 fuzz = require "fuzzaldrin"
 {MessagePanelView, LineMessageView, PlainMessageView} = require 'atom-message-panel'

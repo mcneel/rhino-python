@@ -1,4 +1,4 @@
-{$} = require 'atom'
+$ = require "jquery"
 shelljs = require "shelljs"
 ttr = require './talk-to-rhino'
 
@@ -15,8 +15,8 @@ module.exports =
 
   activate: ->
     @ready = true
-    atom.workspaceView.command "rhino-python:saveAndRunInRhino", => @saveAndRunInRhino()
-    atom.workspaceView.command "rhino-python:saveAndRunInRhinoFromTreeView", => @saveAndRunInRhinoFromTreeView()
+    atom.commands.add 'atom-workspace', 'rhino-python:saveAndRunInRhino': => @saveAndRunInRhino()
+    atom.commands.add 'atom-workspace', 'rhino-python:saveAndRunInRhinoFromTreeView': => @saveAndRunInRhinoFromTreeView()
 
   deactivate: ->
     @provider = null

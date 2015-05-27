@@ -1,4 +1,4 @@
-{$} = require 'atom'
+$ = require "jquery"
 
 module.exports =
   getCompletionData: (lines, callRhinoPosition, path, prefix, clearCache, cache, filter) ->
