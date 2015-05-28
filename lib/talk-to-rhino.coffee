@@ -11,8 +11,8 @@ module.exports =
             console.log response
           else
             suggestions = ($.parseJSON response)?.map (cd) =>
-              {word: cd.Name, prefix: '', label: '<span style="color: gray"><- Rhino</span>', renderLabelAsHtml: true}
-            console.log "fetched from Rhino: #{suggestions?.length} suggestions"
+              {text: cd.Name, replacementPrefix: '', rightLabelHTML: '<span style="color: gray"><- Rhino</span>'}
+            console.log "fetched from Rhino: #{suggestions?.length} suggestions", suggestions
           suggestions
         .always (newSuggestions) ->
           cache(callRhinoPosition, newSuggestions)
@@ -20,9 +20,9 @@ module.exports =
         .fail (response) ->
           console.log 'getCompletionData failed:', response
 
-  getDocString: (options, lines) ->
+  getDocString: ({editor, bufferPosition}, lines) ->
     lines[lines.length-1] = lines[lines.length-1].replace /\($/, ''
-    ccreq = JSON.stringify {Lines: lines, CaretColumn: options.position.column, FileName: options.editor.getPath()}
+    ccreq = JSON.stringify {Lines: lines, CaretColumn: bufferPosition.column, FileName: editor.getPath()}
     return $.post "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getdocstring", ccreq, 'json'
       .then (response) ->
         if /^no completion data/.test response then response else ($.parseJSON response)?.ds

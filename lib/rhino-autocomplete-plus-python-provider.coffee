@@ -6,19 +6,18 @@ ttr = require './talk-to-rhino'
 
 module.exports =
 class RhinoProvider
-  id: 'rhino-python-rhinoprovider'
   selector: '.source.python'
-  blacklist: '.source.python .comment'
-  providerblacklist: 'autocomplete-plus-fuzzyprovider'
+  disableForSelector: '.source.python .comment'
+  inclusionPriority: 1
+  excludeLowerPriority: true
   @cachedSuggestions = []
   @callRhinoPosition = null
 
-  requestHandler: (options) ->
-    prefix = if /\s$/.test options.prefix then ' ' else options.prefix
-    #console.log "options.prefix: **#{options.prefix}**, **#{prefix}**"
-    lines = options.buffer.getLines()[0..options.position.row]
+  getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
+    prefix = if /\s$/.test prefix then ' ' else prefix
+    lines = editor.buffer.getLines()[0..bufferPosition.row]
     return [] unless lines.length
-    cursorLine = lines[lines.length-1][0..options.position.column-1]
+    cursorLine = lines[lines.length-1][0..bufferPosition.column-1]
     return [] unless cursorLine?
     callRhinoPosition = @getCallRhinoPosition cursorLine, lines.length-1
     return [] unless callRhinoPosition
@@ -31,18 +30,19 @@ class RhinoProvider
       @clearCache()
       if @stringIsOpenParen prefix
         lines.push cursorLine
-        @getAndShowDocString(options, lines)
+        @getAndShowDocString({editor, bufferPosition}, lines)
         return []
       lines.push lineLeftOfCallRhinoPosition
-      return ttr.getCompletionData lines, callRhinoPosition, options.editor.getPath(),
+      return ttr.getCompletionData lines, callRhinoPosition, editor.getPath(),
         if @stringIsCallRhinoChar prefix then null else prefix,
         @clearCache,
         (p, s) -> RhinoProvider.callRhinoPosition = p; RhinoProvider.cachedSuggestions = s,
         (pfx) => @filterCachedSuggestions pfx
 
   filterCachedSuggestions: (prefix) ->
-    suggestions = fuzz.filter RhinoProvider.cachedSuggestions, prefix, key: 'word'
-    return suggestions.map (s) -> {word: s.word, prefix: prefix, label: s.label, renderLabelAsHtml: true}
+    suggestions = fuzz.filter RhinoProvider.cachedSuggestions, prefix, key: 'text'
+    console.log "hey", suggestions
+    return suggestions.map (s) -> {text: s.text, replacementPrefix: prefix, rightLabelHTML: s.rightLabelHTML}
 
   stringIsCallRhinoChar: (s) ->
     /^[\s\.(]$/.test s

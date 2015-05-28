@@ -21,14 +21,11 @@ module.exports =
   deactivate: ->
     @provider = null
 
-  getProvider: ->
-      return @provider if @provider?
+  provide: ->
+    unless @provider?
       RhinoProvider = require('./rhino-autocomplete-plus-python-provider')
       @provider = new RhinoProvider()
-      return @provider
-
-  provide: ->
-    return {provider: @getProvider()}
+    @provider
 
   saveAndRunInRhino: ->
     rhinoIsntListeningMsg = "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
