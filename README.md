@@ -58,6 +58,11 @@ Because completion data can come from many providers, the data coming from rhino
 In this release getting completion data after "import ", "from ", or "from x import " doesn't work exactly
 the same way as in the embedded editor that's in Rhino for Windows where the completion window opens right after you type the trailing space as in "import ".  In Atom you need to press the first letter of the module you want to import before the completion window opens (ex: "import r").  This is how many other editors work (Visual Studio with Resharper, PyCharm) and it's how the latest release Atom works for now.  This might change in the future and when it does then the completion window will open just like in Rhino for Windows.
 
+## Get Involved  
+
+  - Join discussions on our [forum](http://discourse.mcneel.com)  
+  - Report Issues on our [youtrack](http://mcneel.myjetbrains.com/youtrack/dashboard) site.
+
 
   [1]: https://atom.io
   [2]: http://https://www.rhino3d.com/download/rhino-for-mac/5.0/wip
