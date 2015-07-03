@@ -1,6 +1,12 @@
 $ = require "jquery"
 shelljs = require "shelljs"
 ttr = require './talk-to-rhino'
+{CompositeDisposable} = require 'atom'
+RhinoSettingsView = require './rhino-settings-view'
+Vue = require 'vue'
+remote = require 'remote'
+dialog = remote.require 'dialog'
+_ = require 'underscore'
 
 module.exports =
   config:
@@ -13,13 +19,57 @@ module.exports =
   provider: null
   ready: false
 
-  activate: ->
+  activate: (state) ->
     @ready = true
-    atom.commands.add 'atom-workspace', 'rhino-python:saveAndRunInRhino': => @saveAndRunInRhino()
-    atom.commands.add 'atom-workspace', 'rhino-python:saveAndRunInRhinoFromTreeView': => @saveAndRunInRhinoFromTreeView()
+
+    # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
+    @subscriptions = new CompositeDisposable
+
+    @subscriptions.add atom.commands.add 'atom-workspace', 'rhino-python:saveAndRunInRhino': => @saveAndRunInRhino()
+    @subscriptions.add atom.commands.add 'atom-workspace', 'rhino-python:saveAndRunInRhinoFromTreeView': => @saveAndRunInRhinoFromTreeView()
+
+    @rhinoSettingsView = new RhinoSettingsView(state.rhinoSettigsViewState)
+    @modalPanel = atom.workspace.addBottomPanel(item: @rhinoSettingsView.getElement(), visible: false)
+    @subscriptions.add atom.commands.add 'atom-workspace', 'rhino-python:toggleRhinoSettingsView': => @toggleRhinoSettingsView()
+
+    v = new Vue({
+      el: '#RhinoSettingsView'
+      methods:
+        add: ->
+          p = dialog.showOpenDialog({properties:['openDirectory']})
+          unless p?
+            return
+
+          fp = i.content for i in @paths when i.content == p[0]
+          unless fp?
+            @paths.push({content: p[0], markdelete: false})
+            console.log 'paths:', @paths, 'p[0]:', p[0], 'a:', a
+        save: -> alert 'save!'
+      data:
+        paths: [
+          {
+            content: '/mypath',
+            markdelete: false
+          },
+          {
+            content: '/myotherpath',
+            markdelete: true
+          }
+        ]
+    })
+
+  localfunc: ->
+    console.log 'local func'
+
+  toggleRhinoSettingsView: ->
+    if @modalPanel.isVisible()
+      @modalPanel.hide()
+    else
+      @modalPanel.show()
 
   deactivate: ->
     @provider = null
+    @subscriptions.dispose()
 
   provide: ->
     unless @provider?

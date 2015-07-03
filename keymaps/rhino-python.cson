@@ -10,3 +10,4 @@
 'atom-workspace':
   'ctrl-alt-r': 'rhino-python:saveAndRunInRhino'
   'shift-ctrl-space': 'autocomplete-plus:activate'
+  'ctrl-alt-s': 'rhino-python:toggleRhinoSettingsView'
