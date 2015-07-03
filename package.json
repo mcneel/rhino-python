@@ -13,7 +13,8 @@
     "shelljs": "*",
     "atom-message-panel": "1.2.0",
     "underscore": "1.7.0",
-    "jquery": "*"
+    "jquery": "*",
+    "vue": "git+https://git@github.com/yyx990803/vue.git#b3c529992e322daa4c3a486137730078edd22ffd"
   },
   "providedServices": {
     "autocomplete.provider": {
