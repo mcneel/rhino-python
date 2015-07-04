@@ -4,59 +4,87 @@ class RhinoSettingsView
     # Create root element
     @element = document.createElement('div')
     @element.id = 'RhinoSettingsView'
-    # @element.classList.add('hello-vue')
 
-    # Create message element
     title = document.createElement('div')
     title.textContent = "Rhino Python Search Paths:"
-    title.classList.add('title')
+    title.classList.add('text-highlight')
     @element.appendChild(title)
 
     ul = document.createElement('ul')
     li = document.createElement('li')
     li.setAttribute('v-repeat', 'paths')
-    li.setAttribute('v-on', 'click: markdelete = !markdelete')
-    li.setAttribute('class', "{{markdelete ? 'markdelete' : ''}}")
-    # li.classList.add("{{markdelete ? 'markdelete' : ''}}")
-    li.textContent = '{{content}}'
+
+    p = document.createElement('span')
+    p.textContent = '{{path}}'
+    p.setAttribute('v-on', 'click: select(this)')
+    li.appendChild(p)
+
+    li.setAttribute('class', "{{markdelete ? 'markdelete' : ''}} {{selected ? 'selected' : ''}}")
     ul.appendChild(li)
     @element.appendChild(ul)
 
-    msg = document.createElement('div')
-    msg.textContent = "click on a path to mark it for deletion"
-    msg.classList.add('msg')
-    @element.appendChild(msg)
+    btnGrpDiv = document.createElement('div')
+    btnGrpDiv.classList.add('inline-block')
+    btnGrpDiv.classList.add('btn-group')
 
     btn = document.createElement('button')
-    btn.textContent = 'add path'
+    btn.classList.add('btn')
+    btn.classList.add('icon')
+    btn.classList.add('icon-plus')
     btn.setAttribute('v-on', 'click: add')
-    @element.appendChild(btn)
+    btnGrpDiv.appendChild(btn)
 
     btn = document.createElement('button')
-    btn.textContent = 'save changes'
+    btn.classList.add('btn')
+    btn.classList.add('icon')
+    btn.classList.add('icon-dash')
+    btn.setAttribute('v-attr', 'disabled: deleteDisabled')
+    btn.setAttribute('v-on', 'click: delete')
+    btnGrpDiv.appendChild(btn)
+
+    btn = document.createElement('button')
+    btn.classList.add('btn')
+    btn.classList.add('icon')
+    btn.classList.add('icon-arrow-up')
+    btn.setAttribute('v-attr', 'disabled: upDisabled')
+    #btn.setAttribute('v-on', 'click: move-up')
+    btnGrpDiv.appendChild(btn)
+
+    btn = document.createElement('button')
+    btn.classList.add('btn')
+    btn.classList.add('icon')
+    btn.classList.add('icon-arrow-down')
+    btn.setAttribute('v-attr', 'disabled: downDisabled')
+    btn.setAttribute('v-on', 'click: move-down')
+    btnGrpDiv.appendChild(btn)
+
+    btn = document.createElement('button')
+    btn.classList.add('btn')
+    btn.classList.add('icon')
+    btn.classList.add('icon-file-directory')
+    btn.setAttribute('v-attr', 'disabled: showDisabled')
+    btn.setAttribute('v-on', 'click: show-in-finder')
+    btnGrpDiv.appendChild(btn)
+
+    btn = document.createElement('button')
+    btn.classList.add('btn')
+    btn.classList.add('icon')
+    btn.classList.add('icon-sync')
+    btn.setAttribute('v-attr', 'disabled: saveDisabled')
     btn.setAttribute('v-on', 'click: save')
-    @element.appendChild(btn)
+    btn.textContent = 'save'
+    btnGrpDiv.appendChild(btn)
 
-    # ul = document.createElement('ul')
-    # li = document.createElement('li')
-    # sp = document.createElement('span')
-    # sp.textContent = '-'
-    # sp.style.color = 'red'
-    # li.appendChild(sp)
-    # sp = document.createElement('span')
-    # sp.textContent = '/thepath'
-    # li.appendChild(sp)
-    # #li.textContent = '/thepath'
-    # ul.appendChild(li)
-    # li = document.createElement('li')
-    # li.textContent = '/theotherpath/on/my/fs/somewhere'
-    # ul.appendChild(li)
-    # @element.appendChild(ul)
+    btn = document.createElement('button')
+    btn.classList.add('btn')
+    btn.classList.add('icon')
+    btn.classList.add('icon-history')
+    btn.setAttribute('v-attr', 'disabled: revertDisabled')
+    btn.setAttribute('v-on', 'click: revert')
+    btn.textContent = 'revert'
+    btnGrpDiv.appendChild(btn)
 
-    # ta = document.createElement('textarea')
-    # ta.rows = 10
-    # ta.cols = 50
-    # @element.appendChild(ta)
+    @element.appendChild(btnGrpDiv)
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->
