@@ -47,7 +47,7 @@ class RhinoSettingsView
     btn.classList.add('icon')
     btn.classList.add('icon-arrow-up')
     btn.setAttribute('v-attr', 'disabled: upDisabled')
-    #btn.setAttribute('v-on', 'click: move-up')
+    btn.setAttribute('v-on', 'click: moveUp')
     btnGrpDiv.appendChild(btn)
 
     btn = document.createElement('button')
@@ -55,7 +55,7 @@ class RhinoSettingsView
     btn.classList.add('icon')
     btn.classList.add('icon-arrow-down')
     btn.setAttribute('v-attr', 'disabled: downDisabled')
-    btn.setAttribute('v-on', 'click: move-down')
+    btn.setAttribute('v-on', 'click: moveDown')
     btnGrpDiv.appendChild(btn)
 
     btn = document.createElement('button')
