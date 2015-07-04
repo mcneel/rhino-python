@@ -36,30 +36,85 @@ module.exports =
       el: '#RhinoSettingsView'
       methods:
         add: ->
-          p = dialog.showOpenDialog({properties:['openDirectory']})
-          unless p?
+          path_to_add = dialog.showOpenDialog({properties:['openDirectory']})
+          unless path_to_add?
             return
-
-          fp = i.content for i in @paths when i.content == p[0]
-          unless fp?
-            @paths.push({content: p[0], markdelete: false})
-            console.log 'paths:', @paths, 'p[0]:', p[0], 'a:', a
+          #fp = i.content for i in @paths when i.content == p[0]
+          dup_path = _.find(@paths, (p) -> p.path == path_to_add[0])
+          unless dup_path?
+            len = @paths.push({path: path_to_add[0], markdelete: false, selected: false})
+            @dirty = true
+            @select _.last(@paths)
+        delete: ->
+          unless @aPathIsSelected()?
+            # this should never happen
+            alert 'no path is selected'
+          sp = @selectedPath()
+          newps = _.reject(@paths, (p) -> p.path == sp.path)
+          @paths = newps
+          #@paths = _.reject(@paths, (p) -> p.path == @selectedPath().path)
+          @dirty = true
+          @setBtnEnabled()
         save: -> alert 'save!'
+        revert: -> alert 'revert!'
+        select: (path) ->
+          console.log 'select path', path
+          _.each(_.filter(@paths, (i) -> i.selected == true), (p) -> p.selected = false)
+          path.selected = true
+          @setBtnEnabled()
+        setBtnEnabled: ->
+          @disableAllBtnsExceptAdd()
+          if @aPathIsSelected()
+            @deleteDisabled = false
+            @showDisabled = false
+            if @selectedIsNotFirst()
+              @upDisabled = false
+            if @selectedIsNotLast()
+              @downDisabled = false
+          if @dirty
+            @saveDisabled = false
+            @revertDisabled = false
+
+        disableAllBtnsExceptAdd: ->
+          @deleteDisabled = true
+          @upDisabled = true
+          @downDisabled = true
+          @showDisabled = true
+          @saveDisabled = true
+          @revertDisabled = true
+
+        aPathIsSelected: ->
+          _.any(@paths, (p) -> p.selected)
+
+        selectedPath: ->
+          _.find(@paths, (p) -> p.selected)
+
+        selectedIsNotFirst: ->
+          @aPathIsSelected() and @selectedPath().path != _.first(@paths).path
+
+        selectedIsNotLast: ->
+          @aPathIsSelected() and @selectedPath().path != _.last(@paths).path
       data:
+        dirty: false
+        deleteDisabled: true
+        upDisabled: true
+        downDisabled: true
+        showDisabled: true
+        saveDisabled: true
+        revertDisabled: true
         paths: [
           {
-            content: '/mypath',
-            markdelete: false
+            path: '/mypath',
+            markdelete: false,
+            selected: false
           },
           {
-            content: '/myotherpath',
-            markdelete: true
+            path: '/myotherpath',
+            markdelete: false,
+            selected: false
           }
         ]
     })
-
-  localfunc: ->
-    console.log 'local func'
 
   toggleRhinoSettingsView: ->
     if @modalPanel.isVisible()
