@@ -55,6 +55,21 @@ module.exports =
           #@paths = _.reject(@paths, (p) -> p.path == @selectedPath().path)
           @dirty = true
           @setBtnEnabled()
+        moveUp: -> @move('up')
+        moveDown: -> @move('down')
+        move: (upOrDown) ->
+          if upOrDown == 'up' and @selectedIsFirst()
+            return
+          if upOrDown == 'down' and @selectedIsLast()
+            return
+          sp = @selectedPath()
+          idx = _.indexOf(@paths, sp)
+          console.log 'idx', idx
+          newps = _.reject(@paths, (p) -> p.path == sp.path)
+          newidx = if upOrDown == 'up' then --idx else ++idx
+          newps.splice(newidx, 0, sp)
+          @paths = newps
+          @setBtnEnabled()
         save: -> alert 'save!'
         revert: -> alert 'revert!'
         select: (path) ->
@@ -89,11 +104,15 @@ module.exports =
         selectedPath: ->
           _.find(@paths, (p) -> p.selected)
 
+        selectedIsFirst: ->
+          @aPathIsSelected() and @selectedPath().path == _.first(@paths).path
         selectedIsNotFirst: ->
-          @aPathIsSelected() and @selectedPath().path != _.first(@paths).path
+          not @selectedIsFirst()
 
+        selectedIsLast: ->
+          @aPathIsSelected() and @selectedPath().path == _.last(@paths).path
         selectedIsNotLast: ->
-          @aPathIsSelected() and @selectedPath().path != _.last(@paths).path
+          not @selectedIsLast()
       data:
         dirty: false
         deleteDisabled: true
