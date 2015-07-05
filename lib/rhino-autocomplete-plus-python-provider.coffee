@@ -41,7 +41,6 @@ class RhinoProvider
 
   filterCachedSuggestions: (prefix) ->
     suggestions = fuzz.filter RhinoProvider.cachedSuggestions, prefix, key: 'text'
-    console.log "hey", suggestions
     return suggestions.map (s) -> {text: s.text, replacementPrefix: prefix, rightLabelHTML: s.rightLabelHTML}
 
   stringIsCallRhinoChar: (s) ->
