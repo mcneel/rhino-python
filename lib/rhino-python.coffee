@@ -32,7 +32,7 @@ module.exports =
     @modalPanel = atom.workspace.addBottomPanel(item: @rhinoSettingsView.getElement(), visible: false)
     @subscriptions.add atom.commands.add 'atom-workspace', 'rhino-python:toggleRhinoSettingsView': => @toggleRhinoSettingsView()
 
-    v = new Vue({
+    @v = new Vue({
       el: '#RhinoSettingsView'
       methods:
         add: ->
@@ -42,7 +42,7 @@ module.exports =
           #fp = i.content for i in @paths when i.content == p[0]
           dup_path = _.find(@paths, (p) -> p.path == path_to_add[0])
           unless dup_path?
-            len = @paths.push({path: path_to_add[0], markdelete: false, selected: false})
+            len = @paths.push({path: path_to_add[0], selected: false})
             @dirty = true
             @select _.last(@paths)
         delete: ->
@@ -62,18 +62,23 @@ module.exports =
             return
           if upOrDown == 'down' and @selectedIsLast()
             return
+          @dirty = true
           sp = @selectedPath()
           idx = _.indexOf(@paths, sp)
-          console.log 'idx', idx
           newps = _.reject(@paths, (p) -> p.path == sp.path)
           newidx = if upOrDown == 'up' then --idx else ++idx
           newps.splice(newidx, 0, sp)
           @paths = newps
           @setBtnEnabled()
+        show: -> alert 'show!'
         save: -> alert 'save!'
-        revert: -> alert 'revert!'
+        revert: ->
+          ttr.getPythonSearchPaths((psp) =>
+            @paths = psp
+            @dirty = false
+            @setBtnEnabled()
+          )
         select: (path) ->
-          console.log 'select path', path
           _.each(_.filter(@paths, (i) -> i.selected == true), (p) -> p.selected = false)
           path.selected = true
           @setBtnEnabled()
@@ -121,24 +126,24 @@ module.exports =
         showDisabled: true
         saveDisabled: true
         revertDisabled: true
-        paths: [
-          {
-            path: '/mypath',
-            markdelete: false,
-            selected: false
-          },
-          {
-            path: '/myotherpath',
-            markdelete: false,
-            selected: false
-          }
-        ]
+        paths: []
     })
 
   toggleRhinoSettingsView: ->
     if @modalPanel.isVisible()
+      if @v.dirty
+        alert "resolve unsaved changes before closing"
+        return
       @modalPanel.hide()
     else
+      if @v.dirty
+        alert "Closed settings view is dirty.  This should never happen."
+      console.log 'aoeuaoeu'
+      ttr.getPythonSearchPaths((psp) =>
+        @v.paths = psp
+        @v.dirty = false
+        @v.setBtnEnabled()
+      )
       @modalPanel.show()
 
   deactivate: ->

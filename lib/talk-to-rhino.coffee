@@ -1,4 +1,5 @@
-$ = require "jquery"
+$ = require 'jquery'
+_ = require 'underscore'
 
 module.exports =
   getCompletionData: (lines, callRhinoPosition, path, prefix, clearCache, cache, filter) ->
@@ -26,6 +27,14 @@ module.exports =
     return $.post "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/getdocstring", ccreq, 'json'
       .then (response) ->
         if /^no completion data/.test response then response else ($.parseJSON response)?.ds
+
+  getPythonSearchPaths: (callback) ->
+    # I'm having problems consuming a Promise from a Vue (vue.js) so use a callback
+    $.getJSON "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/getpythonsearchpaths"
+      .then (response) ->
+        if /^no python search paths/.test response then response else response?.psp
+      .done (psp) ->
+        callback(_.map(psp, (p) => {path: p, selected: false}))
 
   rhinoIsListening: ->
     return $.getJSON "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/ping"

@@ -19,7 +19,7 @@ class RhinoSettingsView
     p.setAttribute('v-on', 'click: select(this)')
     li.appendChild(p)
 
-    li.setAttribute('class', "{{markdelete ? 'markdelete' : ''}} {{selected ? 'selected' : ''}}")
+    li.setAttribute('class', "{{selected ? 'selected' : ''}}")
     ul.appendChild(li)
     @element.appendChild(ul)
 
@@ -63,7 +63,7 @@ class RhinoSettingsView
     btn.classList.add('icon')
     btn.classList.add('icon-file-directory')
     btn.setAttribute('v-attr', 'disabled: showDisabled')
-    btn.setAttribute('v-on', 'click: show-in-finder')
+    btn.setAttribute('v-on', 'click: show')
     btnGrpDiv.appendChild(btn)
 
     btn = document.createElement('button')
