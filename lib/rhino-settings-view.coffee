@@ -8,6 +8,7 @@ class RhinoSettingsView
     title = document.createElement('div')
     title.textContent = "Rhino Python Search Paths:"
     title.classList.add('text-highlight')
+    title.classList.add('title')
     @element.appendChild(title)
 
     ul = document.createElement('ul')
@@ -85,6 +86,21 @@ class RhinoSettingsView
     btnGrpDiv.appendChild(btn)
 
     @element.appendChild(btnGrpDiv)
+
+    div = document.createElement('div')
+    div.id = 'restartScriptEngine'
+    cb = document.createElement('input')
+    cb.id = "restartScriptEngineCb"
+    cb.setAttribute('type', 'checkbox')
+    cb.setAttribute('v-model', 'restartEngineChecked')
+    cb.setAttribute('v-attr', 'disabled: saveDisabled')
+    #cb.setAttribute('v-on', 'click: restartEngineChecked = !restartEngineChecked')
+    lbl = document.createElement('label')
+    lbl.setAttribute('for', 'restartScriptEngineCb')
+    lbl.textContent = 'restart script engine on \'save\''
+    div.appendChild(cb)
+    div.appendChild(lbl)
+    @element.appendChild(div)
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->
