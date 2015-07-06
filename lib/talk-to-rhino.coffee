@@ -36,6 +36,14 @@ module.exports =
       .done (psp) ->
         callback(_.map(psp, (p) => {path: p, selected: false}))
 
+  setPythonSearchPaths: (paths, callback) ->
+    # I'm having problems consuming a Promise from a Vue (vue.js) so use a callback
+    jsonPaths = JSON.stringify _.map(paths, (p) -> p.path)
+    $.post "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/setpythonsearchpaths", jsonPaths, 'json'
+      .done (response) ->
+        console.log 'setPythonSearchPaths:', response
+        callback(response)
+
   rhinoIsListening: ->
     return $.getJSON "http://localhost:#{atom.config.get 'rhino-python.httpPort'}/ping"
       .then (response) ->
