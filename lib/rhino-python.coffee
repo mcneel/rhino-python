@@ -72,8 +72,8 @@ module.exports =
           @setBtnEnabled()
         show: -> alert 'show!'
         save: ->
-          ttr.setPythonSearchPaths(@paths, (response) =>
-            if response == 'ok'
+          ttr.setPythonSearchPaths(@paths, @restartEngineChecked, (response) =>
+            if /^ok/.test response
               @dirty = false
               @setBtnEnabled()
           )
@@ -131,6 +131,7 @@ module.exports =
         showDisabled: true
         saveDisabled: true
         revertDisabled: true
+        restartEngineChecked: true
         paths: []
     })
 
