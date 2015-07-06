@@ -71,7 +71,12 @@ module.exports =
           @paths = newps
           @setBtnEnabled()
         show: -> alert 'show!'
-        save: -> alert 'save!'
+        save: ->
+          ttr.setPythonSearchPaths(@paths, (response) =>
+            if response == 'ok'
+              @dirty = false
+              @setBtnEnabled()
+          )
         revert: ->
           ttr.getPythonSearchPaths((psp) =>
             @paths = psp
@@ -132,13 +137,12 @@ module.exports =
   toggleRhinoSettingsView: ->
     if @modalPanel.isVisible()
       if @v.dirty
-        alert "resolve unsaved changes before closing"
+        alert "Rhino Python Search Paths: have unresolved changes.  Save or revert them before closing."
         return
       @modalPanel.hide()
     else
       if @v.dirty
         alert "Closed settings view is dirty.  This should never happen."
-      console.log 'aoeuaoeu'
       ttr.getPythonSearchPaths((psp) =>
         @v.paths = psp
         @v.dirty = false
