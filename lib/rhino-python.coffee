@@ -136,6 +136,7 @@ module.exports =
     })
 
   toggleRhinoSettingsView: ->
+    ttr.rhinoIsListening()
     if @modalPanel.isVisible()
       if @v.dirty
         alert "Rhino Python Search Paths: have unresolved changes.  Save or revert them before closing."
@@ -144,12 +145,18 @@ module.exports =
     else
       if @v.dirty
         alert "Closed settings view is dirty.  This should never happen."
-      ttr.getPythonSearchPaths((psp) =>
-        @v.paths = psp
-        @v.dirty = false
-        @v.setBtnEnabled()
-      )
-      @modalPanel.show()
+      ttr.rhinoIsListening()
+        .done (isListening) ->
+          [isListening, _] = isListening
+          if isListening
+            ttr.getPythonSearchPaths((psp) =>
+              @v.paths = psp
+              @v.dirty = false
+              @v.setBtnEnabled()
+            )
+            @modalPanel.show()
+        .fail (errorObject) ->
+          alert "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
 
   deactivate: ->
     @provider = null
@@ -162,6 +169,7 @@ module.exports =
     @provider
 
   saveAndRunInRhino: ->
+    ttr.rhinoIsListening()
     rhinoIsntListeningMsg = "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
     editor = atom.workspace.getActiveTextEditor()
     if editor and not /.py$/.test editor.getPath()
