@@ -87,20 +87,20 @@ class RhinoSettingsView
 
     @element.appendChild(btnGrpDiv)
 
-    div = document.createElement('div')
-    div.id = 'restartScriptEngine'
-    cb = document.createElement('input')
-    cb.id = "restartScriptEngineCb"
-    cb.setAttribute('type', 'checkbox')
-    cb.setAttribute('v-model', 'restartEngineChecked')
-    cb.setAttribute('v-attr', 'disabled: saveDisabled')
-    #cb.setAttribute('v-on', 'click: restartEngineChecked = !restartEngineChecked')
-    lbl = document.createElement('label')
-    lbl.setAttribute('for', 'restartScriptEngineCb')
-    lbl.textContent = 'restart script engine on \'save\''
-    div.appendChild(cb)
-    div.appendChild(lbl)
-    @element.appendChild(div)
+    # div = document.createElement('div')
+    # div.id = 'restartScriptEngine'
+    # cb = document.createElement('input')
+    # cb.id = "restartScriptEngineCb"
+    # cb.setAttribute('type', 'checkbox')
+    # cb.setAttribute('v-model', 'restartEngineChecked')
+    # cb.setAttribute('v-attr', 'disabled: saveDisabled')
+    # #cb.setAttribute('v-on', 'click: restartEngineChecked = !restartEngineChecked')
+    # lbl = document.createElement('label')
+    # lbl.setAttribute('for', 'restartScriptEngineCb')
+    # lbl.textContent = 'restart script engine on \'save\''
+    # div.appendChild(cb)
+    # div.appendChild(lbl)
+    # @element.appendChild(div)
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->

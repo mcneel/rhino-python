@@ -47,9 +47,7 @@ module.exports =
             if p.selected
               dup_path = p
           unless dup_path?
-            console.log 'no dup_path', @paths
             len = @paths.push({path: path_to_add[0], selected: false})
-            console.log 'paths:', @paths
             @dirty = true
             #@select _.last(@paths)
             @select @paths[len-1]
@@ -135,7 +133,6 @@ module.exports =
         aPathIsSelected: ->
           #can't access the underscore lib from here?
           #_.any(@paths, (p) -> p.selected)
-          console.log 'paths:', @paths
           apis = false
           for p in @paths
             if p.selected
@@ -168,13 +165,11 @@ module.exports =
         showDisabled: true
         saveDisabled: true
         revertDisabled: true
-        restartEngineChecked: true
+        restartEngineChecked: false
         paths: []
     })
 
   toggleRhinoSettingsView: ->
-    #ttr.rhinoIsListening()
-    console.log 'toggle:', @modalPanel
     if @modalPanel.isVisible()
       if @v.dirty
         alert "Rhino Python Search Paths: have unresolved changes.  Save or revert them before closing."
@@ -230,9 +225,7 @@ module.exports =
         alert(rhinoIsntListeningMsg)
 
   bringRhinoToFront: (rhinoPath) ->
-    #console.log "bringRhinoToFront: open #{rhinoPath}"
     rhino = shelljs.exec("open #{rhinoPath}", async: true, (code, output) ->
-      #console.log "bringRhinoToFront: exit code: #{code}"
       console.log "bringRhinoToFront: output: #{output}" unless not output
     )
 
