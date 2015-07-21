@@ -19,6 +19,9 @@ module.exports =
   provider: null
   ready: false
 
+  _indexOf: (coll, item) ->
+    _.indexOf(coll, item)
+
   activate: (state) ->
     @ready = true
 
@@ -39,20 +42,32 @@ module.exports =
           path_to_add = dialog.showOpenDialog({properties:['openDirectory']})
           unless path_to_add?
             return
-          #fp = i.content for i in @paths when i.content == p[0]
-          dup_path = _.find(@paths, (p) -> p.path == path_to_add[0])
+          #dup_path = _.find(@paths, (p) -> p.path == path_to_add[0])
+          for p in @paths
+            if p.selected
+              dup_path = p
           unless dup_path?
+            console.log 'no dup_path', @paths
             len = @paths.push({path: path_to_add[0], selected: false})
+            console.log 'paths:', @paths
             @dirty = true
-            @select _.last(@paths)
+            #@select _.last(@paths)
+            @select @paths[len-1]
         delete: ->
           unless @aPathIsSelected()?
             # this should never happen
             alert 'no path is selected'
           sp = @selectedPath()
-          newps = _.reject(@paths, (p) -> p.path == sp.path)
-          @paths = newps
-          #@paths = _.reject(@paths, (p) -> p.path == @selectedPath().path)
+          #newps = _.reject(@paths, (p) -> p.path == sp.path)
+          #@paths = newps
+          idx = -1
+          `for (i = 0; i < this.paths.length; i++) {
+            if (this.paths[i].path == sp.path) {
+              idx = i;
+            }
+          }`
+          #newps = _.reject(@paths, (p) -> p.path == sp.path)
+          @paths.splice(idx, 1) # delete from array
           @dirty = true
           @setBtnEnabled()
         moveUp: -> @move('up')
@@ -64,11 +79,17 @@ module.exports =
             return
           @dirty = true
           sp = @selectedPath()
-          idx = _.indexOf(@paths, sp)
-          newps = _.reject(@paths, (p) -> p.path == sp.path)
+          #idx = _.indexOf(@paths, sp)
+          idx = -1
+          `for (i = 0; i < this.paths.length; i++) {
+            if (this.paths[i].path == sp.path) {
+              idx = i;
+            }
+          }`
+          #newps = _.reject(@paths, (p) -> p.path == sp.path)
+          @paths.splice(idx, 1) # delete from array
           newidx = if upOrDown == 'up' then --idx else ++idx
-          newps.splice(newidx, 0, sp)
-          @paths = newps
+          @paths.splice(newidx, 0, sp) # add item in new position
           @setBtnEnabled()
         show: -> alert 'show!'
         save: ->
@@ -84,7 +105,10 @@ module.exports =
             @setBtnEnabled()
           )
         select: (path) ->
-          _.each(_.filter(@paths, (i) -> i.selected == true), (p) -> p.selected = false)
+          #_.each(_.filter(@paths, (i) -> i.selected == true), (p) -> p.selected = false)
+          for p in @paths
+            if p.selected == true
+              p.selected = false
           path.selected = true
           @setBtnEnabled()
         setBtnEnabled: ->
@@ -109,18 +133,31 @@ module.exports =
           @revertDisabled = true
 
         aPathIsSelected: ->
-          _.any(@paths, (p) -> p.selected)
+          #can't access the underscore lib from here?
+          #_.any(@paths, (p) -> p.selected)
+          console.log 'paths:', @paths
+          apis = false
+          for p in @paths
+            if p.selected
+              apis = true
+          apis
 
         selectedPath: ->
-          _.find(@paths, (p) -> p.selected)
+          #_.find(@paths, (p) -> p.selected)
+          for p in @paths
+            if p.selected
+              sp = p
+          sp
 
         selectedIsFirst: ->
-          @aPathIsSelected() and @selectedPath().path == _.first(@paths).path
+          #@aPathIsSelected() and @selectedPath().path == _.first(@paths).path
+          @aPathIsSelected() and @selectedPath().path == @paths[0].path
         selectedIsNotFirst: ->
           not @selectedIsFirst()
 
         selectedIsLast: ->
-          @aPathIsSelected() and @selectedPath().path == _.last(@paths).path
+          #@aPathIsSelected() and @selectedPath().path == _.last(@paths).path
+          @aPathIsSelected() and @selectedPath().path == @paths[@paths.length-1].path
         selectedIsNotLast: ->
           not @selectedIsLast()
       data:
@@ -136,7 +173,8 @@ module.exports =
     })
 
   toggleRhinoSettingsView: ->
-    ttr.rhinoIsListening()
+    #ttr.rhinoIsListening()
+    console.log 'toggle:', @modalPanel
     if @modalPanel.isVisible()
       if @v.dirty
         alert "Rhino Python Search Paths: have unresolved changes.  Save or revert them before closing."
@@ -146,15 +184,15 @@ module.exports =
       if @v.dirty
         alert "Closed settings view is dirty.  This should never happen."
       ttr.rhinoIsListening()
-        .done (isListening) ->
+        .done (isListening) =>
           [isListening, _] = isListening
           if isListening
             ttr.getPythonSearchPaths((psp) =>
               @v.paths = psp
               @v.dirty = false
               @v.setBtnEnabled()
+              @modalPanel.show()
             )
-            @modalPanel.show()
         .fail (errorObject) ->
           alert "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
 
