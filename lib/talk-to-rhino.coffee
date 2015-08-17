@@ -51,7 +51,7 @@ module.exports =
 
   runInRhino: (path) ->
     rpfreq = JSON.stringify {FileName: path}
-    rhinoUrl = "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/runpythonscriptfile"
+    rhinoUrl = "http://localhost:#{ atom.config.get 'rhino-python.httpPort'}/executescript"
     $.post rhinoUrl, rpfreq, 'json'
       .then (response) ->
         ($.parseJSON response)?.msg

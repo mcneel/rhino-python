@@ -205,8 +205,8 @@ module.exports =
     ttr.rhinoIsListening()
     rhinoIsntListeningMsg = "Rhino isn't listening for requests.  Run the \"StartAtomEditorListener\" command from within Rhino."
     editor = atom.workspace.getActiveTextEditor()
-    if editor and not /.py$/.test editor.getPath()
-      alert("Can't save and run.  Not a python file.")
+    if editor and not /.py$/.test editor.getPath() and not /.csx%/.test editor.getPath()
+      alert("Can't save and run.  Not a Python or a C# script (.csx) file.")
       return
     editor.save()
     ttr.rhinoIsListening()
