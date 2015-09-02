@@ -42,12 +42,13 @@ module.exports =
           path_to_add = dialog.showOpenDialog({properties:['openDirectory']})
           unless path_to_add?
             return
+          path_to_add = path_to_add[0]
           #dup_path = _.find(@paths, (p) -> p.path == path_to_add[0])
           for p in @paths
-            if p.selected
-              dup_path = p
+            if p.path == path_to_add
+              dup_path = path_to_add
           unless dup_path?
-            len = @paths.push({path: path_to_add[0], selected: false})
+            len = @paths.push({path: path_to_add, selected: false})
             @dirty = true
             #@select _.last(@paths)
             @select @paths[len-1]
