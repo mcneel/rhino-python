@@ -34,7 +34,7 @@ module.exports =
       .then (response) ->
         if /^no python search paths/.test response then response else response?.psp
       .done (psp) ->
-        callback(_.map(psp, (p) => {path: p, selected: false}))
+        callback(_.map(psp, (p) => {path: p.path, selected: false, type: p.type}))
 
   setPythonSearchPaths: (paths, restartScriptEngine, callback) ->
     # I'm having problems consuming a Promise from a Vue (vue.js) so use a callback

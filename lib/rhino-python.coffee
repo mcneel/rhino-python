@@ -48,7 +48,7 @@ module.exports =
             if p.path == path_to_add
               dup_path = path_to_add
           unless dup_path?
-            len = @paths.push({path: path_to_add, selected: false})
+            len = @paths.push({path: path_to_add, selected: false, type: "user"})
             @dirty = true
             #@select _.last(@paths)
             @select @paths[len-1]
@@ -105,11 +105,12 @@ module.exports =
           )
         select: (path) ->
           #_.each(_.filter(@paths, (i) -> i.selected == true), (p) -> p.selected = false)
-          for p in @paths
-            if p.selected == true
-              p.selected = false
-          path.selected = true
-          @setBtnEnabled()
+          unless path.type == "system"
+            for p in @paths
+              if p.selected == true
+                p.selected = false
+            path.selected = true
+            @setBtnEnabled()
         setBtnEnabled: ->
           @disableAllBtnsExceptAdd()
           if @aPathIsSelected()
@@ -147,9 +148,18 @@ module.exports =
               sp = p
           sp
 
+        systemPathsCount: ->
+           c = 0;
+           `for (i = 0; i < this.paths.length; i++) {
+              if (this.paths[i].type == 'system') {
+                c++;
+              }
+           }`
+           return c
+
         selectedIsFirst: ->
           #@aPathIsSelected() and @selectedPath().path == _.first(@paths).path
-          @aPathIsSelected() and @selectedPath().path == @paths[0].path
+          @aPathIsSelected() and @selectedPath().path == @paths[@systemPathsCount()].path
         selectedIsNotFirst: ->
           not @selectedIsFirst()
 

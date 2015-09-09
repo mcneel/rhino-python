@@ -5,11 +5,16 @@ class RhinoSettingsView
     @element = document.createElement('div')
     @element.id = 'RhinoSettingsView'
 
-    title = document.createElement('div')
+    title = document.createElement('span')
     title.textContent = "Rhino Python Search Paths:"
     title.classList.add('text-highlight')
     title.classList.add('title')
     @element.appendChild(title)
+
+    systemPathsNote = document.createElement('span')
+    systemPathsNote.textContent = "(paths in blue are system paths and cannot be edited)"
+    systemPathsNote.id = 'SystemPathsNote'
+    @element.appendChild(systemPathsNote)
 
     ul = document.createElement('ul')
     li = document.createElement('li')
@@ -21,6 +26,7 @@ class RhinoSettingsView
     li.appendChild(p)
 
     li.setAttribute('class', "{{selected ? 'selected' : ''}}")
+    li.classList.add("{{type}}")
     ul.appendChild(li)
     @element.appendChild(ul)
 
