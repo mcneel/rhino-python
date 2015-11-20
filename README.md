@@ -4,6 +4,7 @@ Code completion support for your Python scripts that are executed by [Rhinoceros
 
 ![rhino-python](https://raw.githubusercontent.com/mcneel/rhino-python/master/docs/main.gif)  
 
+
 ## Installation
 
   - Download and install the latest [Rhino 5 for Mac][2]
@@ -45,9 +46,10 @@ Experiment with the Autocomplete Plus settings to fine tune your setup:
 Because completion data can come from many providers if you installed other packages or if you have the "Enable Built-In Provider" checked in Autocomplete Plus settings, the data coming from rhino is labeled "`<- Rhino`" (right-most column of completion window).
 
 ## Get Involved  
-
+  - [Rhino Developer Docs] (http://developer.rhino3d.com)  
+  - More about [scripting] (http://developer.rhino3d.com/guides/#rhinopython) in Rhino
   - Join discussions on our [forum](http://discourse.mcneel.com)  
-  - Report Issues on our [youtrack](http://mcneel.myjetbrains.com/youtrack/dashboard) site.
+  - Report Issues on our [youtrack](http://mcneel.myjetbrains.com/youtrack/dashboard) site
 
 
   [1]: https://atom.io
