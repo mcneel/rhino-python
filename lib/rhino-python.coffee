@@ -5,7 +5,7 @@ ttr = require './talk-to-rhino'
 RhinoSettingsView = require './rhino-settings-view'
 Vue = require 'vue'
 remote = require 'remote'
-dialog = remote.Dialog
+dialog = remote.dialog
 _ = require 'underscore'
 
 module.exports =
