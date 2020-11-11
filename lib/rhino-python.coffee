@@ -236,7 +236,7 @@ module.exports =
         alert(rhinoIsntListeningMsg)
 
   bringRhinoToFront: (rhinoPath) ->
-    rhino = shelljs.exec("open #{rhinoPath}", async: true, (code, output) ->
+    rhino = shelljs.exec("open \"#{rhinoPath}\"", async: true, (code, output) ->
       console.log "bringRhinoToFront: output: #{output}" unless not output
     )
 
