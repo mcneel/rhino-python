@@ -12,7 +12,7 @@
     "fuzzaldrin": "*",
     "shelljs": "*",
     "atom-message-panel": "1.2.0",
-    "underscore": "1.7.0",
+    "underscore": "1.12.1",
     "jquery": "*",
     "vue": "git+https://git@github.com/vuejs/vue.git#b3c529992e322daa4c3a486137730078edd22ffd"
   },
